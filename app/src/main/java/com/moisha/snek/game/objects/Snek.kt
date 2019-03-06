@@ -25,14 +25,14 @@ class Snek(start_snek: Collection<IntArray>) {
 
     // moves the snek to the next position, according to actual direction
     // returns true if move was successfull or false if game lost
-    // checks meals, barriers and room boundaries by functions provided as arguments
+    // checks meals, barriers and flat boundaries by functions provided as arguments
     fun move_by_direction(
         meal: (IntArray) -> Boolean,
         bar_check: (IntArray) -> Boolean,
         in_room: (IntArray) -> IntArray
     ): Boolean {
 
-        val new_head = in_room(new_head()) // getting new sneks head position, keeping snek in room
+        val new_head = in_room(new_head()) // getting new sneks head position, keeping snek in flat
 
         if (state.indexOf(new_head) > 0) return false // if snek trying to go over itself - return false
 
