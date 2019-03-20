@@ -12,7 +12,7 @@ class Flat(sizeX: Int, sizeY: Int) {
     private val xRange: IntRange = IntRange(0, sizeX - 1)
     private val yRange: IntRange = IntRange(0, sizeY - 1)
 
-    fun keep_in_flat(coord: IntArray): IntArray {
+    fun keepInFlat(coord: IntArray): IntArray {
         if (coord[0] > xRange.last) return intArrayOf(xRange.first, coord[1])
         if (coord[0] < xRange.first) return intArrayOf(xRange.last, coord[1])
         if (coord[1] > yRange.last) return intArrayOf(coord[0], yRange.first)
@@ -21,7 +21,7 @@ class Flat(sizeX: Int, sizeY: Int) {
     }
 
     // returns random point in flat boundaries
-    fun random_point(): IntArray {
+    fun randomPoint(): IntArray {
         return intArrayOf(Random.nextInt(xRange.first, xRange.last), Random.nextInt(yRange.first, yRange.last))
     }
 
