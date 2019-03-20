@@ -2,34 +2,31 @@ package com.moisha.snek.database.model
 
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
+import android.arch.persistence.room.ForeignKey
 import android.arch.persistence.room.PrimaryKey
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
-@Entity
-class Level constructor(listData: List<List<IntArray>>) {
-
-    val gson = Gson()
-
-    private var listData: List<List<IntArray>> = listData
-    private var jsonData: String =
-        gson.toJson(listData, object : TypeToken<List<List<IntArray>>>() {}.type)
-
+@Entity(
+    tableName = "levels",
+    foreignKeys = arrayOf(
+        ForeignKey(entity = Player::class, parentColumns = arrayOf("name"), childColumns = arrayOf("pName"))
+    )
+)
+class Level constructor(size: IntArray, barriers: List<IntArray>, snek: List<IntArray>, direction: Int, pName: String) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
 
-    @ColumnInfo(name = "data")
-    var data: String? = jsonData
+    @ColumnInfo(name = "size")
+    var size: IntArray = size
 
-    fun getSize(): IntArray {
-        return listData.first().first()
-    }
+    @ColumnInfo(name = "barriers")
+    var barriers: List<IntArray> = barriers
 
-    fun getBarriers(): List<IntArray> {
-        return listData.get(1)
-    }
+    @ColumnInfo(name = "snek")
+    var snek: List<IntArray> = snek
 
-    fun getSnek(): List<IntArray> {
-        return listData.get(2)
-    }
+    @ColumnInfo(name = "direction")
+    var direction: Int = direction
+
+    @ColumnInfo(name = "pName")
+    var pName: String = pName
 }

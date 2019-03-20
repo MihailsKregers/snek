@@ -1,20 +1,18 @@
 package com.moisha.snek.database.model
 
-import android.arch.persistence.room.ColumnInfo
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.ForeignKey
-import android.arch.persistence.room.PrimaryKey
-import com.moisha.snek.database.model.Player
-
+import android.arch.persistence.room.*
 
 @Entity(
-    tableName = "highscores",
+    tableName = "playerLevel",
     foreignKeys = arrayOf(
         ForeignKey(entity = Player::class, parentColumns = arrayOf("name"), childColumns = arrayOf("pName")),
         ForeignKey(entity = Level::class, parentColumns = arrayOf("id"), childColumns = arrayOf("levelId"))
+    ),
+    indices = arrayOf(
+        Index(value = arrayOf("pName", "levelId"), unique = true)
     )
 )
-class Highcore(pName: String, levelId: Int, score: Int) {
+class PlayerLevel(pName: String, levelId: Int) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
 
@@ -23,7 +21,4 @@ class Highcore(pName: String, levelId: Int, score: Int) {
 
     @ColumnInfo(name = "levelId")
     var levelId: Int = levelId
-
-    @ColumnInfo(name = "score")
-    var score: Int = score
 }
