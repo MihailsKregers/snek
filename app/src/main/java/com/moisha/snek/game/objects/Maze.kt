@@ -9,7 +9,7 @@ class Maze(barriers: Collection<IntArray>) {
     private val barriers: List<IntArray> = barriers.toList()
 
     // check if exists barrier on provided place
-    private fun check_barrier(coord: IntArray): Boolean {
+    private fun checkBarrier(coord: IntArray): Boolean {
         return !barriers.contains(coord)
     }
 

@@ -9,18 +9,18 @@ class Meal {
     var coords: IntArray = IntArray(2)
 
     //function creates new meal, checking if position is free in the flat by function provided as argument
-    fun new_meal(random: () -> IntArray, is_free: (IntArray) -> Boolean) {
+    fun newMeal(random: () -> IntArray, isFree: (IntArray) -> Boolean) {
         var point: IntArray
 
         do {
             point = random()
-        } while (!is_free(point))
+        } while (!isFree(point))
 
         coords = point
 
     }
 
-    fun is_meal(point: IntArray): Boolean {
+    fun isMeal(point: IntArray): Boolean {
         return point.contentEquals(point)
     }
 
