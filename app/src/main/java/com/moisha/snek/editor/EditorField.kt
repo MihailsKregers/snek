@@ -1,6 +1,7 @@
 package com.moisha.snek.editor
 
 import com.moisha.snek.database.model.Level
+import java.lang.Integer.min
 
 /**
  * Class for handling editor game field
@@ -16,7 +17,7 @@ class EditorField(x: Int, y: Int) {
 
     private var x: Int = x
     private var y: Int = y
-    private var field: Array<IntArray> = Array(x, { y -> IntArray(y) })
+    private var field: Array<IntArray> = Array(x, { IntArray(y) })
 
     private var snekSize: Int = 0
 
@@ -29,11 +30,11 @@ class EditorField(x: Int, y: Int) {
         y = level.size[1]
 
         //initializing field array
-        this.field = Array(x, { y -> IntArray(y) })
+        this.field = Array(x, { IntArray(y) })
 
         //unpacking barriers
         for (i in level.barriers) {
-            field[i[0]][i[1]] = -1
+            setBarrier(i[0], i[1])
         }
 
         //unpacking snek
@@ -51,22 +52,26 @@ class EditorField(x: Int, y: Int) {
         }
     }
 
+    fun getField(): Array<IntArray> {
+        return field
+    }
 
-    fun changeSnek(x: Int, y: Int): Boolean {
+    fun setSnek(x: Int, y: Int): Boolean {
         //if it's the end of Sneks tail - remove it and return true
-        if (field[x][y] == snekSize) {
+        if (field[x][y] == snekSize && snekSize != 0) {
             snekSize--
             field[x][y] = 0
             return true
         }
 
-        //if it's behind the end of Sneks tail - grow to coords and return true
-        if (field[x + 1][y] == snekSize ||
-            field[x - 1][y] == snekSize ||
-            field[x][y + 1] == snekSize ||
-            field[x][y - 1] == snekSize
+        //if it's behind the end of Sneks tail and coords is free - grow to coords and return true
+        if (field[x][y] == 0 && (
+                    field[if (x + 1 >= this.x) 0 else x + 1][y] == snekSize ||
+                            field[if (x - 1 < 0) this.x - 1 else x - 1][y] == snekSize ||
+                            field[x][if (y + 1 >= this.y) 0 else y + 1] == snekSize ||
+                            field[x][if (y - 1 < 0) this.y - 1 else y - 1] == snekSize
+                    )
         ) {
-
             snekSize++
             field[x][y] = snekSize
             return true
@@ -76,7 +81,7 @@ class EditorField(x: Int, y: Int) {
         return false
     }
 
-    fun changeBarrier(x: Int, y: Int): Boolean {
+    fun setBarrier(x: Int, y: Int): Boolean {
         //change state, if empty or barrier
         when (field[x][y]) {
             -1 -> {
@@ -100,10 +105,13 @@ class EditorField(x: Int, y: Int) {
 
         //else clear Snek and return true
         for (i in 0..x - 1) {
-            for (j in 0..y - 1)
-                if (field[i][j] > 0) field[i][j] = 0
+            for (j in 0..y - 1) {
+                if (field[i][j] > 0) {
+                    field[i][j] = 0
+                    snekSize--
+                }
+            }
         }
-        snekSize = 0
 
         return true
     }
@@ -115,13 +123,9 @@ class EditorField(x: Int, y: Int) {
         }
     }
 
-    fun addBarrier(x: Int, y: Int) {
-        field[x][y] = if (field[x][y] == 0) 1 else field[x][y]
-    }
-
     fun changeSize(x: Int, y: Int) {
         //making new field of provided size
-        var newField: Array<IntArray> = Array(x, { y -> IntArray(y) })
+        var newField: Array<IntArray> = Array(x, { IntArray(y) })
 
         //copying barriers and Snek to new field
         newField = copySnek(copyBar(newField))
@@ -157,13 +161,17 @@ class EditorField(x: Int, y: Int) {
         return data.toList()
     }
 
+    fun getSnekSize(): Int {
+        return snekSize
+    }
+
     /**
      * PRIVATE (internal)
      */
 
     private fun barList(): List<IntArray> {
         //barrier list to be returned
-        val barriers: MutableList<IntArray> = mutableListOf<IntArray>()
+        val barriers: MutableList<IntArray> = mutableListOf()
 
         //finding barriers in field
         for (i in 0..this.x - 1) {
@@ -176,10 +184,11 @@ class EditorField(x: Int, y: Int) {
     }
 
     private fun copyBar(newField: Array<IntArray>): Array<IntArray> {
-        for (i in 0..(if (field.size > newField.size) newField.size - 1 else field.size - 1)) {
-            for (j in 0..(if (field[i].size > newField[i].size) newField[i].size - 1 else field[i].size - 1)) {
-                if (field[i][j] == -1)
-                    newField[i][j] = field[i][j]
+        for (i: Int in 0..min(field.size - 1, newField.size - 1)) {
+            for (j: Int in 0..min(field[i].size - 1, newField[i].size - 1)) {
+                if (field[i][j] == -1) {
+                    newField[i][j] = -1
+                }
             }
         }
 
@@ -205,17 +214,21 @@ class EditorField(x: Int, y: Int) {
     private fun readSnek(newField: Array<IntArray>): List<IntArray> {
         //list for snek coords to be returned
         val snek: MutableList<IntArray> = mutableListOf()
+        var newSnekSize = 0
 
         //finding Sneks beginning, if it located within the limits of field
-        all@ for (i in 0..newField.size - 1) {
-            for (j in 0..newField[i].size - 1) {
-                if (field[i][j] == 1) snek.add(intArrayOf(i, j))
-                break@all
+        all@ for (i: Int in 0..min(newField.size - 1, field.size - 1)) {
+            for (j: Int in 0..min(newField[i].size - 1, field[i].size - 1)) {
+                if (field[i][j] == 1) {
+                    snek.add(intArrayOf(i, j))
+                    newSnekSize++
+                    break@all
+                }
             }
         }
 
         //loop for finding continuous part of snek from beginning within the limits of provided field
-        while (true) {
+        while (snek.isNotEmpty()) {
             if (snek.last()[0] + 1 < newField.size &&
                 field[snek.last()[0] + 1][snek.last()[1]] == snek.size + 1
             ) {
@@ -235,14 +248,19 @@ class EditorField(x: Int, y: Int) {
                 snek.add(intArrayOf(snek.last()[0], snek.last()[1] + 1))
 
             } else if (snek.last()[1] - 1 >= 0 &&
-                field[snek.last()[0]][snek.last()[1] + 1] == snek.size + 1
+                field[snek.last()[0]][snek.last()[1] - 1] == snek.size + 1
             ) {
 
                 snek.add(intArrayOf(snek.last()[0], snek.last()[1] - 1))
 
-            } else break
+            } else {
+                snekSize = newSnekSize
+                return snek.toList()
+            }
+            newSnekSize++
         }
 
+        snekSize = newSnekSize
         return snek.toList()
     }
 

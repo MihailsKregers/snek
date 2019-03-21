@@ -9,12 +9,12 @@ import com.moisha.snek.game.objects.Snek
  * Main game handler class.
  */
 
-abstract class GameHandle {
+class GameHandle {
 
-    abstract val flat: Flat
-    abstract val maze: Maze
-    abstract val meal: Meal
-    abstract val snek: Snek
+    /*lateinit val flat: Flat
+    lateinit val maze: Maze
+    lateinit val meal: Meal
+    lateinit val snek: Snek*/
 
     init {
 
