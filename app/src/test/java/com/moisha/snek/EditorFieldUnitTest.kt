@@ -1,5 +1,6 @@
 package com.moisha.snek
 
+import com.moisha.snek.database.model.Level
 import com.moisha.snek.editor.EditorField
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertArrayEquals
@@ -8,7 +9,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class EditorFieldUnitTest {
-    val editor: EditorField = EditorField(5, 3)
+    private val editor: EditorField = EditorField(5, 3)
 
     @Test
     @Order(1)
@@ -195,6 +196,64 @@ class EditorFieldUnitTest {
             "After removing Snek"
         )
         assertEquals(0, editor.getSnekSize(), "Snek size is")
+    }
+
+    @Test
+    @Order(11)
+    fun t11_GetLevelObject() {
+        editor.setSnek(0, 4)
+        editor.setSnek(0, 0)
+        editor.setSnek(0, 1)
+        editor.setSnek(1, 1)
+        editor.setSnek(1, 2)
+        editor.setSnek(1, 3)
+        editor.setSnek(1, 4)
+        editor.setSnek(1, 0)
+        editor.setSnek(2, 0)
+        val level: Level = editor.getLevel("LevelName")
+        assertArrayEquals(intArrayOf(5, 5), level.size, "Level size is")
+        for (i: Int in 0..1) {
+            assertArrayEquals(
+                listOf(
+                    intArrayOf(0, 3),
+                    intArrayOf(2, 3)
+                ).get(i), level.barriers.get(i), "Barrier " + i.toString() + " is"
+            )
+        }
+        assertEquals(8, level.snek.size)
+        for (i: Int in 0..6) {
+            assertArrayEquals(
+                listOf(
+                    intArrayOf(0, 0),
+                    intArrayOf(0, 1),
+                    intArrayOf(1, 1),
+                    intArrayOf(1, 2),
+                    intArrayOf(1, 3),
+                    intArrayOf(1, 4),
+                    intArrayOf(1, 0),
+                    intArrayOf(2, 0)
+                ).reversed().get(i), level.snek.get(i), "Sneks " + i.toString() + " element is"
+            )
+        }
+        assertEquals(3, level.direction, "Sneks direction is")
+    }
+
+    @Test
+    @Order(12)
+    fun t12_UnpackLevel() {
+        val level: Level = editor.getLevel("LevelName")
+        val editor2: EditorField = EditorField(level)
+        assertArrayEquals(
+            arrayOf(
+                intArrayOf(2, 3, 0, -1, 1),
+                intArrayOf(8, 4, 5, 6, 7),
+                intArrayOf(9, 0, 0, -1, 0),
+                intArrayOf(0, 0, 0, 0, 0),
+                intArrayOf(0, 0, 0, 0, 0)
+            ),
+            editor2.getField(),
+            "Snek after unpacking"
+        )
     }
 
 }
