@@ -1,17 +1,17 @@
 package com.moisha.snek.database.model
 
-import android.arch.persistence.room.ColumnInfo
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.ForeignKey
-import android.arch.persistence.room.PrimaryKey
+import android.arch.persistence.room.*
 
 @Entity(
     tableName = "levels",
     foreignKeys = arrayOf(
-        ForeignKey(entity = Player::class, parentColumns = arrayOf("name"), childColumns = arrayOf("pName"))
+        ForeignKey(entity = Player::class, parentColumns = arrayOf("id"), childColumns = arrayOf("uId"))
+    ),
+    indices = arrayOf(
+        Index(value = arrayOf("id", "size", "barriers", "snek", "direction", "uId"))
     )
 )
-class Level constructor(size: IntArray, barriers: List<IntArray>, snek: List<IntArray>, direction: Int, pName: String) {
+class Level constructor(size: IntArray, barriers: List<IntArray>, snek: List<IntArray>, direction: Int, uId: Int) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
 
@@ -27,6 +27,6 @@ class Level constructor(size: IntArray, barriers: List<IntArray>, snek: List<Int
     @ColumnInfo(name = "direction")
     var direction: Int = direction
 
-    @ColumnInfo(name = "pName")
-    var pName: String = pName
+    @ColumnInfo(name = "uId")
+    var uId: Int = uId
 }

@@ -130,14 +130,14 @@ class EditorField(x: Int, y: Int) : EditorFieldInternal(x, y) {
         field = newField
     }
 
-    fun getLevel(name: String): Level {
+    fun getLevel(uId: Int): Level {
         val size = intArrayOf(this.x, this.y)
         val barriers = barList()
         val snek = readSnek()
         val direction = readDirection(snek)
 
         //subList works from inclusive to EXCLUSIVE!!! subList length is snek length -1
-        return Level(size, barriers, snek.subList(0, snek.lastIndex), direction, name)
+        return Level(size, barriers, snek.subList(0, snek.lastIndex), direction, uId)
     }
 
     fun getSnekSize(): Int {
