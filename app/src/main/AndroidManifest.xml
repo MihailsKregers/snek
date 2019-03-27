@@ -11,13 +11,39 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity android:name=".activities.MainActivity">
+        </activity>
+        <activity android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activities.LoginActivity">
+        <activity
+                android:name=".activities.SelectUserActivity"
+                android:parentActivityName=".activities.LoginActivity">
+
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activities.LoginActivity"/>
+        </activity>
+        <activity
+                android:name=".activities.RegisterActivity"
+                android:parentActivityName=".activities.LoginActivity">
+
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activities.LoginActivity"/>
+        </activity>
+        <activity android:name=".glactivities.EditorActivity"
+                  android:parentActivityName=".activities.MainActivity">
+
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activities.MainActivity"/>
         </activity>
     </application>
 
