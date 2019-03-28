@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
                         //Delete level
                     }
                     4 -> {
-                        //New level
+                        startActivity(Intent(this@MainActivity, SetSizeActivity::class.java))
                     }
                     5 -> {
                         //Edit level

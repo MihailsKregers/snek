@@ -15,10 +15,6 @@ class GLRenderer : GLSurfaceView.Renderer {
         GLES20.glClearColor(0.7f, 0.7f, 0.7f, 1.0f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
         square = Square()
-        square.draw(
-            floatArrayOf(-0.1f, -0.1f, -0.1f, 0.1f, 0.1f, 0.1f, 0.1f, -0.1f),
-            floatArrayOf(0.0f, 0.0f, 1.0f, 1.0f)
-        )
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {

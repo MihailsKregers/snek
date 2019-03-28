@@ -1,0 +1,64 @@
+package com.moisha.snek.activities
+
+import android.content.Intent
+import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
+import android.view.View
+import android.widget.EditText
+import android.widget.TextView
+import com.google.gson.Gson
+import com.moisha.snek.R
+import com.moisha.snek.database.model.Level
+import com.moisha.snek.glactivities.EditorActivity
+
+class SetSizeActivity : AppCompatActivity() {
+
+    private val gson: Gson = Gson()
+    private lateinit var level: Level
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_set_size)
+
+        if (intent.hasExtra("level")) {
+            level = gson.fromJson(intent.getStringExtra("level"), Level::class.java)
+
+            findViewById<EditText>(R.id.set_size_x).setText(level.size[0].toString())
+            findViewById<EditText>(R.id.set_size_y).setText(level.size[1].toString())
+        }
+    }
+
+    fun startEditor(view: View) {
+        val x: Int = findViewById<EditText>(R.id.set_size_x).text.toString().toInt()
+        val y: Int = findViewById<EditText>(R.id.set_size_y).text.toString().toInt()
+
+        var hasErrors: Boolean = false
+
+        if (x < 6) {
+            findViewById<TextView>(R.id.x_set_error).setText(R.string.x_error)
+            hasErrors = true
+        } else {
+            findViewById<TextView>(R.id.x_set_error).setText(" ")
+        }
+
+        if (y < 3) {
+            findViewById<TextView>(R.id.y_set_error).setText(R.string.y_error)
+            hasErrors = true
+        } else {
+            findViewById<TextView>(R.id.y_set_error).setText(" ")
+        }
+
+        if (!hasErrors) {
+            val editorIntent: Intent = Intent(
+                this@SetSizeActivity,
+                EditorActivity::class.java
+            )
+            if (intent.hasExtra("level")) {
+                editorIntent.putExtra("level", gson.toJson(level))
+            }
+            editorIntent.putExtra("x", x)
+            editorIntent.putExtra("y", y)
+            startActivity(editorIntent)
+        }
+    }
+}

@@ -37,13 +37,16 @@
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".activities.LoginActivity"/>
         </activity>
-        <activity android:name=".glactivities.EditorActivity"
-                  android:parentActivityName=".activities.MainActivity">
+        <activity
+                android:name=".glactivities.EditorActivity"
+                android:parentActivityName=".activities.MainActivity">
 
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".activities.MainActivity"/>
+        </activity>
+        <activity android:name=".activities.SetSizeActivity">
         </activity>
     </application>
 
