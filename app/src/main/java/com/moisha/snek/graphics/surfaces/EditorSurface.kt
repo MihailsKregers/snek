@@ -6,7 +6,6 @@ import android.view.MotionEvent
 import com.moisha.snek.database.model.Level
 import com.moisha.snek.editor.EditorHandle
 import com.moisha.snek.graphics.GLRenderer
-import org.jetbrains.anko.doAsync
 
 class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(context) {
 
@@ -22,13 +21,14 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
 
         queueEvent {
             while (true) {
-                if (width == 0) continue else {
+                if (width == 0 || height == 0) continue else {
                     editor = EditorHandle(levelX, levelY, width, height)
                     break
                 }
             }
-            mRenderer.coords = listOf(editor.getMenuField().get(0))
-            mRenderer.colors = listOf(editor.getMenuField().get(1))
+            val fld: Array<List<FloatArray>> = editor.getRedrawData()
+            mRenderer.coords = fld[0]
+            mRenderer.colors = fld[1]
             requestRender()
         }
     }
@@ -36,8 +36,19 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
     constructor(context: Context, level: Level) : this(context, level.size[0], level.size[1]) {
         queueEvent {
             while (true) {
-                if (width == 0) continue else {
+                if (width == 0 && height == 0) continue else {
                     editor = EditorHandle(level, width, height)
+                    break
+                }
+            }
+        }
+    }
+
+    constructor(context: Context, level: Level, x: Int, y: Int) : this(context, x, y) {
+        queueEvent {
+            while (true) {
+                if (width == 0 && height == 0) {
+                    editor = EditorHandle(level, x, y, width, height)
                     break
                 }
             }
@@ -53,12 +64,13 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
                 }
             })
         }
-        editor = EditorHandle(5, 3, width, height)
-        requestRender()
 
-        mRenderer.coords = listOf(editor.getMenuField().get(0))
-        mRenderer.colors = listOf(editor.getMenuField().get(1))
-        requestRender()
+        queueEvent {
+            mRenderer.coords = listOf(editor.getMenuField().get(0))
+            mRenderer.colors = listOf(editor.getMenuField().get(1))
+
+            requestRender()
+        }
         println(width)
         println(height)
         return true
@@ -66,5 +78,6 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
 
     fun action(x: Float, y: Float) {
         //
+        return
     }
 }
