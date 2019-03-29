@@ -48,6 +48,8 @@
         </activity>
         <activity android:name=".activities.SetSizeActivity">
         </activity>
+        <activity android:name=".activities.SetLevelNameActivity">
+        </activity>
     </application>
 
 </manifest>

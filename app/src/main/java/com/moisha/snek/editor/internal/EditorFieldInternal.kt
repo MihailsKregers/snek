@@ -8,6 +8,8 @@ abstract class EditorFieldInternal(x: Int, y: Int) {
 
     internal var snekSize: Int = 0
 
+    var levelName: String = "-nothing"
+
     protected fun barList(): List<IntArray> {
         //barrier list to be returned
         val barriers: MutableList<IntArray> = mutableListOf()

@@ -2,6 +2,7 @@ package com.moisha.snek.editor
 
 import com.moisha.snek.database.model.Level
 import com.moisha.snek.editor.internal.EditorFieldInternal
+import com.moisha.snek.global.App
 
 /**
  * Class for handling editor game field
@@ -42,6 +43,8 @@ class EditorField(x: Int, y: Int) : EditorFieldInternal(x, y) {
             snekSize++
             field[i[0]][i[1]] = snekSize
         }
+
+        levelName = level.name
     }
 
     fun getField(): Array<IntArray> {
@@ -136,8 +139,8 @@ class EditorField(x: Int, y: Int) : EditorFieldInternal(x, y) {
         val snek = readSnek()
         val direction = readDirection(snek)
 
-        //subList works from inclusive to EXCLUSIVE!!! subList length is snek length -1
-        return Level(size, barriers, snek.subList(0, snek.lastIndex), direction, uId)
+        //subList works from inclusive to EXCLUSIVE!!! subList length is snek length - 1
+        return Level(size, barriers, snek.subList(0, snek.lastIndex), direction, uId, levelName)
     }
 
     fun getSnekSize(): Int {

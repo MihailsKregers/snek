@@ -34,14 +34,18 @@ class SetSizeActivity : AppCompatActivity() {
 
         var hasErrors: Boolean = false
 
-        if (x < 6) {
+        if (x < resources.getInteger(R.integer.min_level_width)
+            || x > resources.getInteger(R.integer.max_level_width)
+        ) {
             findViewById<TextView>(R.id.x_set_error).setText(R.string.x_error)
             hasErrors = true
         } else {
             findViewById<TextView>(R.id.x_set_error).setText(" ")
         }
 
-        if (y < 3) {
+        if (y < resources.getInteger(R.integer.min_level_height)
+            || y > resources.getInteger(R.integer.max_level_height)
+        ) {
             findViewById<TextView>(R.id.y_set_error).setText(R.string.y_error)
             hasErrors = true
         } else {

@@ -22,8 +22,8 @@ class EditorActivity : AppCompatActivity() {
             mGLView = EditorSurface(
                 this,
                 level,
-                intent.getIntExtra("x", R.integer.min_level_width),
-                intent.getIntExtra("y", R.integer.min_level_height)
+                intent.getIntExtra("x", resources.getInteger(R.integer.min_level_width)),
+                intent.getIntExtra("y", resources.getInteger(R.integer.min_level_height))
             )
         } else if (intent.hasExtra("level")) {
             println("LEVELEXTRA\n\n\n\n\n")
@@ -36,8 +36,8 @@ class EditorActivity : AppCompatActivity() {
             println("NOEXTRA\n\n\n\n\n")
             mGLView = EditorSurface(
                 this,
-                intent.getIntExtra("x", 6),
-                intent.getIntExtra("y", 4)
+                intent.getIntExtra("x", resources.getInteger(R.integer.min_level_width)),
+                intent.getIntExtra("y", resources.getInteger(R.integer.min_level_height))
             )
         }
         //mGLView = EditorSurface(this, 20, 12)

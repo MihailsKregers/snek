@@ -8,12 +8,22 @@ import android.arch.persistence.room.*
         ForeignKey(entity = Player::class, parentColumns = arrayOf("id"), childColumns = arrayOf("uId"))
     ),
     indices = arrayOf(
-        Index(value = arrayOf("id", "size", "barriers", "snek", "direction", "uId"))
+        Index(value = arrayOf("id", "name", "size", "barriers", "snek", "direction", "uId"))
     )
 )
-class Level constructor(size: IntArray, barriers: List<IntArray>, snek: List<IntArray>, direction: Int, uId: Int) {
+class Level constructor(
+    size: IntArray,
+    barriers: List<IntArray>,
+    snek: List<IntArray>,
+    direction: Int,
+    uId: Int,
+    name: String
+) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
+
+    @ColumnInfo(name = "name")
+    var name: String = name
 
     @ColumnInfo(name = "size")
     var size: IntArray = size

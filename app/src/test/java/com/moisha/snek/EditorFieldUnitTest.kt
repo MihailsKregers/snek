@@ -210,7 +210,7 @@ class EditorFieldUnitTest {
         editor.setSnek(1, 4)
         editor.setSnek(1, 0)
         editor.setSnek(2, 0)
-        val level: Level = editor.getLevel("LevelName")
+        val level: Level = editor.getLevel(1)
         assertArrayEquals(intArrayOf(5, 5), level.size, "Level size is")
         for (i: Int in 0..1) {
             assertArrayEquals(
@@ -241,7 +241,7 @@ class EditorFieldUnitTest {
     @Test
     @Order(12)
     fun t12_UnpackLevel() {
-        val level: Level = editor.getLevel("LevelName")
+        val level: Level = editor.getLevel(1)
         val editor2: EditorField = EditorField(level)
         assertArrayEquals(
             arrayOf(
