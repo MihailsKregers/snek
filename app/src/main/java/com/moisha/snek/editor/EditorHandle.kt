@@ -1,7 +1,9 @@
 package com.moisha.snek.editor
 
 import android.content.Intent
+import com.moisha.snek.activities.SetLevelNameActivity
 import com.moisha.snek.database.model.Level
+import com.moisha.snek.global.App
 
 class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
 
@@ -43,9 +45,6 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
     private var xOffsetPt: Int
     private var xOffset: Float
 
-    //last state, that was requested for drawing
-    private var screenState: Array<IntArray>
-
     //if editor was called for level editing
     constructor(level: Level, sourceX: Int, sourceY: Int) : this(level.size[0], level.size[1], sourceX, sourceY) {
         editor = EditorField(level)
@@ -77,7 +76,6 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
         xOffset = (2.0f - partSizeX * x) / 2
         xOffsetPt = (sourceX - (partPt * x)) / 2
 
-        screenState = Array<IntArray>(x, { IntArray(y, { -2 }) })
     }
 
     //reaction on provided user click coords
@@ -124,9 +122,6 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
         val field: Array<IntArray> = editor.getField()
         for (i in 0..field.lastIndex) {
             for (j in 0..field[i].lastIndex) {
-                if (field[i][j] == screenState[i][j]) {
-                    continue
-                }
                 coords.add(
                     floatArrayOf(
                         xOffset + -1.0f + partSizeX * i, 1.0f - partSizeY * j - partSizeY,
@@ -152,9 +147,6 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
                     }
                 }
             }
-        }
-        for (i in 0..screenState.lastIndex) {
-            screenState[i] = field[i].copyOf()
         }
 
         return arrayOf(coords.toList(), colors.toList())

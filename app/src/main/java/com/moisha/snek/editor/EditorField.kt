@@ -140,7 +140,7 @@ class EditorField(x: Int, y: Int) : EditorFieldInternal(x, y) {
         val direction = readDirection(snek)
 
         //subList works from inclusive to EXCLUSIVE!!! subList length is snek length - 1
-        return Level(size, barriers, snek.subList(0, snek.lastIndex), direction, uId, levelName)
+        return Level(size, barriers, snek.subList(0, snek.lastIndex), direction, uId, this.levelName)
     }
 
     fun getSnekSize(): Int {

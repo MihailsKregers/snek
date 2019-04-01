@@ -10,6 +10,7 @@ import com.moisha.snek.R
 import com.moisha.snek.database.DatabaseInstance
 import com.moisha.snek.database.adapters.PlayerAdapter
 import com.moisha.snek.database.model.Player
+import com.moisha.snek.glactivities.EditorActivity
 import com.moisha.snek.global.App
 import kotlinx.android.synthetic.main.activity_select_user.*
 import org.jetbrains.anko.doAsync

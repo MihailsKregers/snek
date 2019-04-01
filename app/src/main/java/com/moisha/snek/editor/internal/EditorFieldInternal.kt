@@ -1,5 +1,8 @@
 package com.moisha.snek.editor.internal
 
+import com.moisha.snek.R
+import com.moisha.snek.global.App
+
 abstract class EditorFieldInternal(x: Int, y: Int) {
 
     internal var x: Int = x
@@ -8,7 +11,7 @@ abstract class EditorFieldInternal(x: Int, y: Int) {
 
     internal var snekSize: Int = 0
 
-    var levelName: String = "-nothing"
+    var levelName: String = App.applicationContext().resources.getString(R.string.empty_level_name)
 
     protected fun barList(): List<IntArray> {
         //barrier list to be returned

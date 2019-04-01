@@ -6,5 +6,8 @@
     <integer name="max_level_height">25</integer>
     <string name="x_error">x should be 6-20!</string>
     <string name="y_error">y should be 4-25!</string>
+    <string name="name_error">Name is already used!</string>
+    <string name="name_empty_error">Name should not be empty!</string>
     <string name="empty_level_name">-nothing</string>
+    <string name="empty_string"></string>
 </resources>

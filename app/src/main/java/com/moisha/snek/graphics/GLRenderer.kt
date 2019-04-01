@@ -16,6 +16,8 @@ class GLRenderer : GLSurfaceView.Renderer {
     var tr_coords: List<FloatArray> = listOf()
     var tr_colors: List<FloatArray> = listOf()
 
+    var menu: Array<List<FloatArray>> = arrayOf()
+
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         GLES20.glClearColor(0.7f, 0.7f, 0.7f, 1.0f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
@@ -45,6 +47,11 @@ class GLRenderer : GLSurfaceView.Renderer {
     }
 
     override fun onDrawFrame(gl: GL10?) {
+
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+
+        //redraw menu
+        redrawMenu()
 
         //draw all sent squares
         for (i in 0..sq_coords.lastIndex) {
@@ -81,6 +88,19 @@ class GLRenderer : GLSurfaceView.Renderer {
             // add the source code to the shader and compile it
             GLES20.glShaderSource(shader, shaderCode)
             GLES20.glCompileShader(shader)
+        }
+    }
+
+    fun redrawMenu() {
+
+        //draw all sent squares
+        for (i in 0..menu[0].lastIndex) {
+            square.draw(menu[0].get(i), menu[1].get(i))
+        }
+
+        //draw all sent triangles
+        for (i in 0..menu[2].lastIndex) {
+            triangle.draw(menu[2].get(i), menu[3].get(i))
         }
     }
 

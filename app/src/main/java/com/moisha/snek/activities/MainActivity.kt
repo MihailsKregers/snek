@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     1 -> {
                         //Highscores
+                        startActivity(Intent(this@MainActivity, SetLevelNameActivity::class.java))
                     }
                     2 -> {
                         startActivity(Intent(this@MainActivity, EditorActivity::class.java))

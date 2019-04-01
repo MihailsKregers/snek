@@ -48,7 +48,14 @@
         </activity>
         <activity android:name=".activities.SetSizeActivity">
         </activity>
-        <activity android:name=".activities.SetLevelNameActivity">
+        <activity
+                android:name=".activities.SetLevelNameActivity"
+                android:parentActivityName=".glactivities.EditorActivity">
+
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".glactivities.EditorActivity"/>
         </activity>
     </application>
 

@@ -4,13 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.opengl.GLSurfaceView
 import android.view.MotionEvent
+import com.google.gson.Gson
 import com.moisha.snek.R
 import com.moisha.snek.activities.SetLevelNameActivity
+import com.moisha.snek.activities.SetSizeActivity
 import com.moisha.snek.database.model.Level
 import com.moisha.snek.editor.EditorHandle
 import com.moisha.snek.glactivities.EditorActivity
 import com.moisha.snek.global.App
 import com.moisha.snek.graphics.GLRenderer
+import kotlinx.android.synthetic.main.activity_set_level_name.view.*
 
 class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(context) {
 
@@ -18,6 +21,8 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
 
     private val mRenderer: GLRenderer
     private lateinit var editor: EditorHandle
+
+    private val gson: Gson = Gson()
 
     init {
         setEGLContextClientVersion(2) //OpenGL ES 2.0
@@ -40,18 +45,14 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
             }
 
             //when editor initialized draw menu
-            val menu: Array<List<FloatArray>> = editor.getMenuDrawData()
 
-            mRenderer.sq_coords = menu[0]
-            mRenderer.sq_colors = menu[1]
-            mRenderer.tr_coords = menu[2]
-            mRenderer.tr_colors = menu[3]
+            mRenderer.menu = editor.getMenuDrawData()
 
             //..and field
             val drawData: Array<List<FloatArray>> = editor.getRedrawData()
 
-            mRenderer.sq_coords = listOf(mRenderer.sq_coords, drawData[0]).flatten()
-            mRenderer.sq_colors = listOf(mRenderer.sq_colors, drawData[1]).flatten()
+            mRenderer.sq_coords = drawData[0]
+            mRenderer.sq_colors = drawData[1]
 
             requestRender()
         }
@@ -63,20 +64,30 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
             while (true) {
                 if (width == 0 && height == 0) continue else {
                     editor = EditorHandle(level, width, height)
+
+                    setRedraw()
+
                     break
                 }
             }
+
+            requestRender()
         }
     }
 
     constructor(context: Context, level: Level, x: Int, y: Int) : this(context, x, y) {
         queueEvent {
             while (true) {
-                if (width == 0 && height == 0) {
+                if (width == 0 && height == 0) continue else {
                     editor = EditorHandle(level, x, y, width, height)
+
+                    setRedraw()
+
                     break
                 }
             }
+
+            requestRender()
         }
     }
 
@@ -96,6 +107,10 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
         queueEvent {
             when (editor.reactOnClick(x.toInt(), y.toInt())) {
                 5 -> {
+                    val uId = App.getUser()
+                    changeSize(
+                        editor.getLevel(uId)
+                    )
                 }
                 6 -> {
                     val uId = App.getUser()
@@ -104,10 +119,7 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
                     )
                 }
                 0 -> {
-                    val drawData: Array<List<FloatArray>> = editor.getRedrawData()
-
-                    mRenderer.sq_coords = drawData[0]
-                    mRenderer.sq_colors = drawData[1]
+                    setRedraw()
 
                     requestRender()
                 }
@@ -115,13 +127,53 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
         }
     }
 
+    fun getLevel(): Level {
+
+        val uId: Int = App.getUser()
+
+        return editor.getLevel(uId)
+    }
+
     private fun saveLevel(level: Level) {
-        if (level.name.equals(R.string.empty_level_name)) {
-            val saveLevelIntent: Intent = Intent(
-                context, SetLevelNameActivity::class.java
+
+        if (level.name.equals(context.getString(R.string.empty_level_name))) {
+
+            val getNameIntent: Intent = Intent(
+                context,
+                SetLevelNameActivity::class.java
             )
-            (context as EditorActivity).startActivity(saveLevelIntent)
+
+            (context as EditorActivity).startActivityForResult(getNameIntent, EditorActivity.GET_NAME_REQUEST)
+
+        } else {
+            //
         }
+
         return
+
+    }
+
+    private fun changeSize(level: Level) {
+
+        val changeSizeIntent: Intent = Intent(
+            context,
+            SetSizeActivity::class.java
+        )
+
+        changeSizeIntent.putExtra("level", gson.toJson(level, Level::class.java))
+
+        (context as EditorActivity).startActivity(changeSizeIntent)
+
+        return
+
+    }
+
+    private fun setRedraw() {
+
+        val drawData: Array<List<FloatArray>> = editor.getRedrawData()
+
+        mRenderer.sq_coords = drawData[0]
+        mRenderer.sq_colors = drawData[1]
+
     }
 }

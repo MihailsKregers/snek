@@ -17,6 +17,7 @@ class SetSizeActivity : AppCompatActivity() {
     private lateinit var level: Level
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_set_size)
 
@@ -40,7 +41,7 @@ class SetSizeActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.x_set_error).setText(R.string.x_error)
             hasErrors = true
         } else {
-            findViewById<TextView>(R.id.x_set_error).setText(" ")
+            findViewById<TextView>(R.id.x_set_error).setText(R.string.empty_string)
         }
 
         if (y < resources.getInteger(R.integer.min_level_height)
@@ -49,20 +50,26 @@ class SetSizeActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.y_set_error).setText(R.string.y_error)
             hasErrors = true
         } else {
-            findViewById<TextView>(R.id.y_set_error).setText(" ")
+            findViewById<TextView>(R.id.y_set_error).setText(R.string.empty_string)
         }
 
         if (!hasErrors) {
+
             val editorIntent: Intent = Intent(
                 this@SetSizeActivity,
                 EditorActivity::class.java
             )
+
             if (intent.hasExtra("level")) {
-                editorIntent.putExtra("level", gson.toJson(level))
+                editorIntent.putExtra("level", intent.getStringExtra("level"))
             }
+
             editorIntent.putExtra("x", x)
             editorIntent.putExtra("y", y)
+
             startActivity(editorIntent)
+
         }
+
     }
 }
