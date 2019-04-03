@@ -14,6 +14,7 @@ class EditorActivity : AppCompatActivity() {
 
     companion object {
         val GET_NAME_REQUEST: Int = 1
+        val GET_SIZE_REQUEST: Int = 2
     }
 
 
@@ -25,17 +26,7 @@ class EditorActivity : AppCompatActivity() {
         setContentView(R.layout.activity_editor)
 
         // if called with level data and new level size for resizing
-        if (intent.hasExtra("level") && intent.hasExtra("x") && intent.hasExtra("y")) {
-
-            val level: Level = gson.fromJson(intent.getStringExtra("level"), Level::class.java)
-            mGLView = EditorSurface(
-                this@EditorActivity,
-                level,
-                intent.getIntExtra("x", resources.getInteger(R.integer.min_level_width)),
-                intent.getIntExtra("y", resources.getInteger(R.integer.min_level_height))
-            )
-
-        } else if (intent.hasExtra("level")) { // if called with level for editing
+        if (intent.hasExtra("level")) { // if called with level for editing
 
             val level: Level = gson.fromJson(intent.getStringExtra("level"), Level::class.java)
             mGLView = EditorSurface(
@@ -63,21 +54,45 @@ class EditorActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == GET_NAME_REQUEST) {
                 if (data?.hasExtra("name") ?: false) {
-                    val level: Level = mGLView.getLevel()
 
-                    level.name = data?.getStringExtra("name") ?: resources.getString(R.string.empty_level_name)
-                    println(level.name)
-                    println(level.name)
-                    println(level.name)
-                    println(level.name)
-                    println(level.name)
-                    println(level.name)
+                    mGLView.saveLevel(
+                        data?.getStringExtra("name") ?: resources.getString(R.string.empty_level_name)
+                    )
+
+                }
+            } else if (requestCode == GET_SIZE_REQUEST) {
+                println("YES")
+                println("YES")
+                println("YES")
+                println("YdfdfdfES")
+                println("YES")
+                println("YES")
+                println("YES")
+                println("YES")
+                if (data?.hasExtra("x") ?: false && data?.hasExtra("y") ?: false) {
+
+                    println("YES")
+                    println("YES")
+                    println("YES")
+                    println("YES")
+                    println("YES")
+                    println("YES")
+                    println("YES")
+                    println("YES")
+                    mGLView.resizeLevel(
+                        data?.getIntExtra(
+                            "x",
+                            resources.getInteger(R.integer.min_level_width)
+                        ) ?: resources.getInteger(R.integer.min_level_width),
+                        data?.getIntExtra(
+                            "y",
+                            resources.getInteger(R.integer.min_level_height)
+                        ) ?: resources.getInteger(R.integer.min_level_height)
+                    )
+
                 }
             }
         }
     }
 
-    fun saveLevel() {
-        //
-    }
 }

@@ -7,20 +7,20 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 import com.moisha.snek.R
-import com.moisha.snek.database.model.Player
+import com.moisha.snek.database.model.Level
 
-class PlayerAdapter(context: Context, playerList: ArrayList<Player>) : BaseAdapter() {
-    private val playerList: ArrayList<Player> = playerList
+class LevelAdapter(context: Context, levelList: ArrayList<Level>) : BaseAdapter() {
+    private val levelList: ArrayList<Level> = levelList
     private val context: Context = context
 
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getCount(): Int {
-        return playerList.size
+        return levelList.size
     }
 
     override fun getItem(position: Int): Any {
-        return playerList[position]
+        return levelList[position]
     }
 
     override fun getItemId(position: Int): Long {
@@ -34,16 +34,16 @@ class PlayerAdapter(context: Context, playerList: ArrayList<Player>) : BaseAdapt
 
         val id = rowView.findViewById(R.id.list_item_id) as TextView
 
-        val user: Player = getItem(position) as Player
+        val level: Level = getItem(position) as Level
 
-        name.text = user.name
-        id.text = user.id.toString()
+        name.text = level.name
+        id.text = level.id.toString()
 
         return rowView
     }
 
-    fun addAll(data: Collection<Player>) {
-        playerList.addAll(data)
+    fun addAll(data: Collection<Level>) {
+        levelList.addAll(data)
         this.notifyDataSetChanged()
     }
 }

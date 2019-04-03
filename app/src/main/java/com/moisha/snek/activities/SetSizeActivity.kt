@@ -1,5 +1,6 @@
 package com.moisha.snek.activities
 
+import android.app.Activity
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -9,7 +10,6 @@ import android.widget.TextView
 import com.google.gson.Gson
 import com.moisha.snek.R
 import com.moisha.snek.database.model.Level
-import com.moisha.snek.glactivities.EditorActivity
 
 class SetSizeActivity : AppCompatActivity() {
 
@@ -21,11 +21,15 @@ class SetSizeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_set_size)
 
-        if (intent.hasExtra("level")) {
-            level = gson.fromJson(intent.getStringExtra("level"), Level::class.java)
+        if (intent.hasExtra("x") && intent.hasExtra("y")) {
 
-            findViewById<EditText>(R.id.set_size_x).setText(level.size[0].toString())
-            findViewById<EditText>(R.id.set_size_y).setText(level.size[1].toString())
+            findViewById<EditText>(R.id.set_size_x).setText(
+                intent.getIntExtra("x", resources.getInteger(R.integer.min_level_width)).toString()
+            )
+            findViewById<EditText>(R.id.set_size_y).setText(
+                intent.getIntExtra("x", resources.getInteger(R.integer.min_level_height)).toString()
+            )
+
         }
     }
 
@@ -55,19 +59,14 @@ class SetSizeActivity : AppCompatActivity() {
 
         if (!hasErrors) {
 
-            val editorIntent: Intent = Intent(
-                this@SetSizeActivity,
-                EditorActivity::class.java
-            )
+            val result: Intent = Intent()
 
-            if (intent.hasExtra("level")) {
-                editorIntent.putExtra("level", intent.getStringExtra("level"))
-            }
+            result.putExtra("x", x)
+            result.putExtra("y", y)
 
-            editorIntent.putExtra("x", x)
-            editorIntent.putExtra("y", y)
+            setResult(Activity.RESULT_OK, result)
 
-            startActivity(editorIntent)
+            finish()
 
         }
 

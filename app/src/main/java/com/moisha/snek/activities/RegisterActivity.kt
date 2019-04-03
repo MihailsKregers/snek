@@ -31,7 +31,7 @@ class RegisterActivity : AppCompatActivity() {
         doAsync {
             val dao = DatabaseInstance.getInstance(this@RegisterActivity).playerDao()
 
-            if (dao.nameUsed(name) == 1) {
+            if (dao.nameUsed(name) > 0) {
                 uiThread {
                     findViewById<TextView>(R.id.register_error).setText(R.string.name_error)
                 }

@@ -74,18 +74,21 @@ abstract class EditorFieldInternal(x: Int, y: Int) {
         //loop for finding continuous part of snek from beginning within the limits of provided field
         while (snek.isNotEmpty()) {
             if (snek.last()[0] + 1 < newField.size &&
+                snek.last()[0] + 1 < field.size &&
                 field[snek.last()[0] + 1][snek.last()[1]] == snek.size + 1
             ) {
 
-                snek.add(intArrayOf(snek.last()[0] + 1, snek.last()[1]))
+                if (field[snek.last()[0] + 1][snek.last()[1]] == snek.size + 1)
+                    snek.add(intArrayOf(snek.last()[0] + 1, snek.last()[1]))
 
             } else if (snek.last()[0] - 1 >= 0 &&
-                field[snek.last()[0] + 1][snek.last()[1]] == snek.size + 1
+                field[snek.last()[0] - 1][snek.last()[1]] == snek.size + 1
             ) {
 
                 snek.add(intArrayOf(snek.last()[0] - 1, snek.last()[1]))
 
             } else if (snek.last()[1] + 1 < newField[0].size &&
+                snek.last()[1] + 1 < field[0].size &&
                 field[snek.last()[0]][snek.last()[1] + 1] == snek.size + 1
             ) {
 

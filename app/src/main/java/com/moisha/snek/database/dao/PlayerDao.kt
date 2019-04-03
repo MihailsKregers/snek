@@ -7,7 +7,7 @@ import com.moisha.snek.database.model.Player
 
 @Dao
 interface PlayerDao {
-    //
+
     @get:Query("SELECT * FROM players")
     val all: List<Player>
 

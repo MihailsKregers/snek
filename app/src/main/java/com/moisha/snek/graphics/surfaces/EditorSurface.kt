@@ -8,12 +8,15 @@ import com.google.gson.Gson
 import com.moisha.snek.R
 import com.moisha.snek.activities.SetLevelNameActivity
 import com.moisha.snek.activities.SetSizeActivity
+import com.moisha.snek.database.DatabaseInstance
+import com.moisha.snek.database.dao.LevelDao
 import com.moisha.snek.database.model.Level
 import com.moisha.snek.editor.EditorHandle
 import com.moisha.snek.glactivities.EditorActivity
 import com.moisha.snek.global.App
 import com.moisha.snek.graphics.GLRenderer
-import kotlinx.android.synthetic.main.activity_set_level_name.view.*
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(context) {
 
@@ -49,12 +52,7 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
             mRenderer.menu = editor.getMenuDrawData()
 
             //..and field
-            val drawData: Array<List<FloatArray>> = editor.getRedrawData()
-
-            mRenderer.sq_coords = drawData[0]
-            mRenderer.sq_colors = drawData[1]
-
-            requestRender()
+            setRedraw()
         }
 
     }
@@ -64,22 +62,6 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
             while (true) {
                 if (width == 0 && height == 0) continue else {
                     editor = EditorHandle(level, width, height)
-
-                    setRedraw()
-
-                    break
-                }
-            }
-
-            requestRender()
-        }
-    }
-
-    constructor(context: Context, level: Level, x: Int, y: Int) : this(context, x, y) {
-        queueEvent {
-            while (true) {
-                if (width == 0 && height == 0) continue else {
-                    editor = EditorHandle(level, x, y, width, height)
 
                     setRedraw()
 
@@ -104,39 +86,45 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
     }
 
     fun action(x: Float, y: Float) {
-        queueEvent {
-            when (editor.reactOnClick(x.toInt(), y.toInt())) {
-                5 -> {
-                    val uId = App.getUser()
-                    changeSize(
-                        editor.getLevel(uId)
-                    )
-                }
-                6 -> {
-                    val uId = App.getUser()
-                    saveLevel(
-                        editor.getLevel(uId)
-                    )
-                }
-                0 -> {
-                    setRedraw()
 
-                    requestRender()
-                }
-            }
+        when (editor.reactOnClick(x.toInt(), y.toInt())) {
+            5 -> changeSize()
+            6 -> saveLevel()
+            0 -> setRedraw()
         }
+
     }
 
-    fun getLevel(): Level {
+    fun resizeLevel(x: Int, y: Int) {
 
         val uId: Int = App.getUser()
+        val level: Level = editor.getLevel(uId)
 
-        return editor.getLevel(uId)
+        queueEvent {
+            while (true) {
+                if (width == 0 && height == 0) continue else {
+                    editor = EditorHandle(level, x, y, width, height)
+
+                    setRedraw()
+
+                    break
+                }
+            }
+
+            requestRender()
+        }
+
     }
 
-    private fun saveLevel(level: Level) {
+    fun saveLevel(name: String = resources.getString(R.string.empty_level_name)) {
 
-        if (level.name.equals(context.getString(R.string.empty_level_name))) {
+        if (!name.equals(resources.getString(R.string.empty_level_name))) {
+
+            editor.setName(name)
+
+        }
+
+        if (editor.getName().equals(resources.getString(R.string.empty_level_name))) {
 
             val getNameIntent: Intent = Intent(
                 context,
@@ -146,23 +134,48 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
             (context as EditorActivity).startActivityForResult(getNameIntent, EditorActivity.GET_NAME_REQUEST)
 
         } else {
-            //
+
+            val uId = App.getUser()
+            val level: Level = editor.getLevel(uId)
+
+            doAsync {
+
+                val lvldao: LevelDao = DatabaseInstance.getInstance(context).levelDao()
+
+                if (lvldao.nameUsed(editor.getName()) > 0) {
+
+                    level.id = lvldao.getIdByName(level.name)
+                    lvldao.updateLevels(level)
+
+                } else {
+
+                    lvldao.insert(level)
+
+                }
+
+                uiThread {
+
+                    (context as EditorActivity).finish()
+
+                }
+            }
         }
 
         return
 
     }
 
-    private fun changeSize(level: Level) {
+    private fun changeSize() {
 
-        val changeSizeIntent: Intent = Intent(
+        val getSizeIntent: Intent = Intent(
             context,
             SetSizeActivity::class.java
         )
 
-        changeSizeIntent.putExtra("level", gson.toJson(level, Level::class.java))
+        getSizeIntent.putExtra("x", editor.getX())
+        getSizeIntent.putExtra("y", editor.getY())
 
-        (context as EditorActivity).startActivity(changeSizeIntent)
+        (context as EditorActivity).startActivityForResult(getSizeIntent, EditorActivity.GET_SIZE_REQUEST)
 
         return
 
@@ -170,10 +183,16 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
 
     private fun setRedraw() {
 
-        val drawData: Array<List<FloatArray>> = editor.getRedrawData()
+        queueEvent {
 
-        mRenderer.sq_coords = drawData[0]
-        mRenderer.sq_colors = drawData[1]
+            val drawData: Array<List<FloatArray>> = editor.getRedrawData()
+
+            mRenderer.sq_coords = drawData[0]
+            mRenderer.sq_colors = drawData[1]
+
+            requestRender()
+
+        }
 
     }
 }

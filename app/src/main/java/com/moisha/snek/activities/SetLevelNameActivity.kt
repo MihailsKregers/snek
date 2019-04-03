@@ -8,7 +8,9 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import com.moisha.snek.R
-import com.moisha.snek.glactivities.EditorActivity
+import com.moisha.snek.database.DatabaseInstance
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 class SetLevelNameActivity : AppCompatActivity() {
 
@@ -24,23 +26,34 @@ class SetLevelNameActivity : AppCompatActivity() {
     fun sendResult(view: View) {
 
         val name = findViewById<EditText>(R.id.level_name).text.toString()
+        var used: Int
 
-        if (name.equals(resources.getString(R.string.empty_string))) {
+        doAsync {
 
-            findViewById<TextView>(R.id.level_name_error).setText(R.string.name_empty_error)
+            used = DatabaseInstance.getInstance(this@SetLevelNameActivity).levelDao().nameUsed(name)
 
-        } else if (false) {
-            //
-        } else {
+            uiThread {
 
-            val result: Intent = Intent()
+                if (name.equals(resources.getString(R.string.empty_string))) {
 
-            result.putExtra("name", name)
+                    findViewById<TextView>(R.id.level_name_error).setText(R.string.name_empty_error)
 
-            setResult(Activity.RESULT_OK, result)
+                } else if (used > 0) {
 
-            finish()
+                    findViewById<TextView>(R.id.level_name_error).setText(R.string.name_error)
 
+                } else {
+
+                    val result: Intent = Intent()
+
+                    result.putExtra("name", name)
+
+                    setResult(Activity.RESULT_OK, result)
+
+                    finish()
+
+                }
+            }
         }
     }
 }

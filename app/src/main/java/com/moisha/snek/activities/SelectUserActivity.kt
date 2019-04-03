@@ -37,8 +37,17 @@ class SelectUserActivity : AppCompatActivity() {
 
         listView.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                App.setUser((parent?.getItemAtPosition(position) as Player).id)
-                startActivity(Intent(this@SelectUserActivity, MainActivity::class.java))
+
+                val player: Player = parent?.getItemAtPosition(position) as Player
+                App.setUser(player.id)
+
+                startActivity(
+                    Intent(
+                        this@SelectUserActivity,
+                        MainActivity::class.java
+                    )
+                )
+
             }
         }
     }

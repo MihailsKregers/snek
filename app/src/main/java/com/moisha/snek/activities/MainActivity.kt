@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import com.moisha.snek.R
-import com.moisha.snek.glactivities.EditorActivity
 import com.moisha.snek.global.App
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +33,7 @@ class MainActivity : AppCompatActivity() {
                         startActivity(Intent(this@MainActivity, SetLevelNameActivity::class.java))
                     }
                     2 -> {
-                        startActivity(Intent(this@MainActivity, EditorActivity::class.java))
+                        startActivity(Intent(this@MainActivity, EditLevelActivity::class.java))
                     }
                     3 -> {
                         //Delete level

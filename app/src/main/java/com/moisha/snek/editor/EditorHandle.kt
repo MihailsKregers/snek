@@ -1,9 +1,6 @@
 package com.moisha.snek.editor
 
-import android.content.Intent
-import com.moisha.snek.activities.SetLevelNameActivity
 import com.moisha.snek.database.model.Level
-import com.moisha.snek.global.App
 
 class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
 
@@ -23,8 +20,8 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
     private var action: Int = 0
 
     //level size
-    private val x: Int = x
-    private val y: Int = y
+    private var x: Int = x
+    private var y: Int = y
 
     //drawable area size in pixels
     private val sourceX: Int = sourceX
@@ -38,7 +35,7 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
     private var menuSizeY: Float
     private var menuSizeYpt: Int
 
-    //single fiel unit size in pixels
+    //single field unit size in pixels
     private var partPt: Int
 
     //field offsets by x on screen in OpenGL coords and pixels
@@ -57,6 +54,7 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
     }
 
     init {
+
         //initializing all element sizes
         menuSizeY = (2.0f / sourceY.toFloat()) * sourceX.toFloat() / 6.0f
 
@@ -155,6 +153,22 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
     //get Level object from editor
     fun getLevel(uId: Int): Level {
         return editor.getLevel(uId)
+    }
+
+    fun getName(): String {
+        return editor.levelName
+    }
+
+    fun setName(name: String) {
+        editor.levelName = name
+    }
+
+    fun getX(): Int {
+        return x
+    }
+
+    fun getY(): Int {
+        return y
     }
 
     //hardcoded menu view
@@ -324,5 +338,25 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
             tr_colors.toList()
         )
 
+    }
+
+    private fun calcOffsets() {
+        menuSizeY = (2.0f / sourceY.toFloat()) * sourceX.toFloat() / 6.0f
+
+        menuSizeYpt = (menuSizeY * sourceY.toFloat() / 2.0f).toInt()
+
+        val freeSizeYpt: Int = sourceY - sourceX / 6
+        if (freeSizeYpt / y < sourceX / x) {
+            partSizeY = (2.0f - menuSizeY) / y.toFloat()
+            partSizeX = partSizeY / sourceX.toFloat() * sourceY.toFloat()
+        } else {
+            partSizeX = 2.0f / x.toFloat()
+            partSizeY = partSizeX / sourceY.toFloat() * sourceX.toFloat()
+        }
+
+        partPt = (partSizeY / 2 * sourceY).toInt()
+
+        xOffset = (2.0f - partSizeX * x) / 2
+        xOffsetPt = (sourceX - (partPt * x)) / 2
     }
 }
