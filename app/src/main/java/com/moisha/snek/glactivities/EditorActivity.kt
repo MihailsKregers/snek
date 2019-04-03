@@ -36,11 +36,7 @@ class EditorActivity : AppCompatActivity() {
 
         } else { // if called for new level creation
 
-            mGLView = EditorSurface(
-                this@EditorActivity,
-                intent.getIntExtra("x", resources.getInteger(R.integer.min_level_width)),
-                intent.getIntExtra("y", resources.getInteger(R.integer.min_level_height))
-            )
+            mGLView = EditorSurface(this@EditorActivity)
 
         }
 
@@ -61,24 +57,9 @@ class EditorActivity : AppCompatActivity() {
 
                 }
             } else if (requestCode == GET_SIZE_REQUEST) {
-                println("YES")
-                println("YES")
-                println("YES")
-                println("YdfdfdfES")
-                println("YES")
-                println("YES")
-                println("YES")
-                println("YES")
+
                 if (data?.hasExtra("x") ?: false && data?.hasExtra("y") ?: false) {
 
-                    println("YES")
-                    println("YES")
-                    println("YES")
-                    println("YES")
-                    println("YES")
-                    println("YES")
-                    println("YES")
-                    println("YES")
                     mGLView.resizeLevel(
                         data?.getIntExtra(
                             "x",

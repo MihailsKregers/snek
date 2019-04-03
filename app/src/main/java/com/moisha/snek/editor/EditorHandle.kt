@@ -5,7 +5,7 @@ import com.moisha.snek.database.model.Level
 class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
 
     //editor field object
-    private var editor: EditorField = EditorField(x, y)
+    private /*lateinit*/ var editor: EditorField = EditorField(x, y)
 
     //actually used action on level
     /**
@@ -169,6 +169,19 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
 
     fun getY(): Int {
         return y
+    }
+
+    fun resizeLevel(x: Int, y: Int) {
+
+        action = 0
+
+        this.x = x
+        this.y = y
+
+        calcOffsets()
+
+        editor.changeSize(x, y)
+
     }
 
     //hardcoded menu view

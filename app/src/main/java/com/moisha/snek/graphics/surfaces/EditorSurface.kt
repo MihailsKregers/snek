@@ -18,7 +18,7 @@ import com.moisha.snek.graphics.GLRenderer
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
-class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(context) {
+class EditorSurface(context: Context, withLevel: Boolean = false) : GLSurfaceView(context) {
 
     private var yOffset: Int = 0
 
@@ -28,36 +28,27 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
     private val gson: Gson = Gson()
 
     init {
+
         setEGLContextClientVersion(2) //OpenGL ES 2.0
 
         mRenderer = GLRenderer()
 
         setRenderer(mRenderer)
 
-        queueEvent {
+        if (!withLevel) {
 
-            //init editor, when viewport size data is set
-            while (true) {
-                if (width == 0 || height == 0) continue else {
-                    editor = EditorHandle(levelX, levelY, width, height)
-                    val onScrLoc: IntArray = intArrayOf(0, 0)
-                    getLocationOnScreen(onScrLoc)
-                    yOffset = onScrLoc[1]
-                    break
-                }
-            }
+            val intent: Intent = Intent(
+                context,
+                SetSizeActivity::class.java
+            )
 
-            //when editor initialized draw menu
+            (context as EditorActivity).startActivityForResult(intent, EditorActivity.GET_SIZE_REQUEST)
 
-            mRenderer.menu = editor.getMenuDrawData()
-
-            //..and field
-            setRedraw()
         }
 
     }
 
-    constructor(context: Context, level: Level) : this(context, level.size[0], level.size[1]) {
+    constructor(context: Context, level: Level) : this(context, true) {
         queueEvent {
             while (true) {
                 if (width == 0 && height == 0) continue else {
@@ -68,6 +59,9 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
                     break
                 }
             }
+
+            //setting offsets and menu after editor initialized
+            fullInit()
 
             requestRender()
         }
@@ -97,22 +91,32 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
 
     fun resizeLevel(x: Int, y: Int) {
 
-        val uId: Int = App.getUser()
-        val level: Level = editor.getLevel(uId)
+        if (!::editor.isInitialized) {
 
-        queueEvent {
-            while (true) {
-                if (width == 0 && height == 0) continue else {
-                    editor = EditorHandle(level, x, y, width, height)
+            initEditor(x, y)
 
-                    setRedraw()
+        } else {
 
-                    break
+            val uId: Int = App.getUser()
+            val level: Level = editor.getLevel(uId)
+
+            queueEvent {
+                while (true) {
+                    if (width == 0 && height == 0) continue else {
+                        editor.resizeLevel(x, y)
+
+                        setRedraw()
+
+                        break
+                    }
                 }
+
+                requestRender()
             }
 
-            requestRender()
         }
+
+
 
     }
 
@@ -193,6 +197,37 @@ class EditorSurface(context: Context, levelX: Int, levelY: Int) : GLSurfaceView(
             requestRender()
 
         }
+
+    }
+
+    private fun initEditor(x: Int, y: Int) {
+
+        queueEvent {
+
+            //init editor, when viewport size data is set
+            while (true) {
+                if (width == 0 || height == 0) continue else {
+                    editor = EditorHandle(x, y, width, height)
+
+                    break
+                }
+            }
+
+            //setting offsets and menu after editor initialized
+            fullInit()
+
+            //..and field
+            setRedraw()
+        }
+    }
+
+    private fun fullInit() {
+
+        mRenderer.menu = editor.getMenuDrawData()
+
+        val onScrLoc: IntArray = intArrayOf(0, 0)
+        getLocationOnScreen(onScrLoc)
+        yOffset = onScrLoc[1]
 
     }
 }

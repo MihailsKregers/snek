@@ -27,7 +27,7 @@ class SetSizeActivity : AppCompatActivity() {
                 intent.getIntExtra("x", resources.getInteger(R.integer.min_level_width)).toString()
             )
             findViewById<EditText>(R.id.set_size_y).setText(
-                intent.getIntExtra("x", resources.getInteger(R.integer.min_level_height)).toString()
+                intent.getIntExtra("y", resources.getInteger(R.integer.min_level_height)).toString()
             )
 
         }
