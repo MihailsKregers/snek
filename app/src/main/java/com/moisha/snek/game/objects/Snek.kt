@@ -10,7 +10,7 @@ class Snek(startSnek: Collection<IntArray>, startDirection: Int) {
     private val state: MutableList<IntArray> = startSnek.toMutableList()
 
     // actual direction of snek moving
-    // 1 - down, 2 - left, 3 - up, 4 - right
+    // 1 - right, 2 - down, 3 - left, 4 - up
     private var direction: Int = startDirection
 
     // sets new direction, if it is not opposite to actual and not same as actual
@@ -42,9 +42,14 @@ class Snek(startSnek: Collection<IntArray>, startDirection: Int) {
             }
         }
 
+        // or if snek going on barrier
+        if (!barCheck(newHead)) {
+            return -1
+        }
+
         // move whole snek or grow to the direction of moving, if meal was eaten
         state.add(newHead)
-        if (!meal(newHead) && !barCheck(newHead)) {
+        if (!meal(newHead)) {
             state.removeAt(0)
             return 0 //not grown up, wasn't meal - return 0
         }

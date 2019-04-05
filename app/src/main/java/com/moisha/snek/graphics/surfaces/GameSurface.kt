@@ -2,10 +2,14 @@ package com.moisha.snek.graphics.surfaces
 
 import android.content.Context
 import android.opengl.GLSurfaceView
+import android.view.MotionEvent
 import com.moisha.snek.database.model.Level
 import com.moisha.snek.game.GameHandle
+import com.moisha.snek.glactivities.GameActivity
 import com.moisha.snek.global.App
 import com.moisha.snek.graphics.GLRenderer
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 class GameSurface(context: Context, level: Level) : GLSurfaceView(context) {
 
@@ -45,6 +49,9 @@ class GameSurface(context: Context, level: Level) : GLSurfaceView(context) {
             mRenderer.menu = game.getMenuDrawData()
 
             requestRender()
+
+            //after all data set and start state drawn, start game loop
+            gameLoop()
         }
 
     }
@@ -62,5 +69,34 @@ class GameSurface(context: Context, level: Level) : GLSurfaceView(context) {
 
         }
 
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            queueEvent(object : Runnable {
+                override fun run() {
+                    game.reactOnClick(
+                        (event.x - xOffset).toInt(),
+                        (event.y - yOffset).toInt()
+                    )
+                }
+            })
+        }
+
+        return true
+    }
+
+    fun gameLoop() {
+        doAsync {
+            while (game.move()) {
+                uiThread {
+                    setRedraw()
+                }
+                Thread.sleep(1000)
+            }
+            uiThread {
+                (context as GameActivity).finish()
+            }
+        }
     }
 }

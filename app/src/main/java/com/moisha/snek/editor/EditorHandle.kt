@@ -171,6 +171,10 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
         return y
     }
 
+    fun getSnekSize(): Int {
+        return editor.getSnekSize()
+    }
+
     fun resizeLevel(x: Int, y: Int) {
 
         action = 0

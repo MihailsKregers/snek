@@ -13,6 +13,10 @@ class GameHandle(level: Level, uId: Int, sourceX: Int, sourceY: Int) : Game(leve
     private val x: Int = level.size[0]
     private val y: Int = level.size[1]
 
+    //drawable area size in pixels
+    private val sourceX: Int = sourceX
+    private val sourceY: Int = sourceY
+
     //single field unit size in OpenGL coords
     private val partSizeX: Float
     private val partSizeY: Float
@@ -49,6 +53,23 @@ class GameHandle(level: Level, uId: Int, sourceX: Int, sourceY: Int) : Game(leve
         xOffset = (2.0f - partSizeX * x) / 2
         xOffsetPt = (sourceX - (partPt * x)) / 2
 
+    }
+
+    fun reactOnClick(x: Int, y: Int) {
+        val buttonSize: Int = sourceX / 6
+        if (y > sourceY - menuSizeYpt) {
+            if (x > buttonSize && x < sourceX - buttonSize) {
+                if (x < buttonSize * 2) {
+                    pendingDirection = 3
+                } else if (x < buttonSize * 3) {
+                    pendingDirection = 2
+                } else if (x < buttonSize * 4) {
+                    pendingDirection = 4
+                } else {
+                    pendingDirection = 1
+                }
+            }
+        }
     }
 
     fun getRedrawData(): Array<List<FloatArray>> {

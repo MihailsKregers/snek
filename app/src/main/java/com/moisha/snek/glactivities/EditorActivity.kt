@@ -1,6 +1,8 @@
 package com.moisha.snek.glactivities
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.opengl.GLSurfaceView
 import android.support.v7.app.AppCompatActivity
@@ -16,7 +18,6 @@ class EditorActivity : AppCompatActivity() {
         val GET_NAME_REQUEST: Int = 1
         val GET_SIZE_REQUEST: Int = 2
     }
-
 
     private lateinit var mGLView: EditorSurface
     private val gson: Gson = Gson()
@@ -73,6 +74,23 @@ class EditorActivity : AppCompatActivity() {
 
                 }
             }
+        }
+    }
+
+    fun error() {
+        println("YEAP")
+
+        this.runOnUiThread {
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+            builder.setMessage(R.string.snek_size_error)
+            builder.setTitle(R.string.short_snek_error)
+            builder.setNeutralButton(
+                R.string.ok,
+                { dialogInterface: DialogInterface, i: Int -> }
+            )
+            val error: AlertDialog = builder.create()
+
+            error.show()
         }
     }
 

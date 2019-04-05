@@ -133,13 +133,13 @@ abstract class EditorFieldInternal(x: Int, y: Int) {
         val dir = snek.last()
         val head = snek.get(snek.size - 2)
         if (dir[1] > head[1]) {
-            return if (head[1] == 0) 3 else 1
+            return if (head[1] == 0) 4 else 2
         } else if (dir[0] > head[0]) {
-            return if (head[0] == 0) 4 else 2
+            return if (head[0] == 0) 3 else 1
         } else if (dir[1] < head[1]) {
-            return if (head[1] == y - 1 && dir[1] == 0) 1 else 3
+            return if (head[1] == y - 1 && dir[1] == 0) 2 else 4
         } else if (dir[0] < head[0]) {
-            return if (head[0] == x - 1 && dir[1] == 0) 2 else 4
+            return if (head[0] == x - 1 && dir[1] == 0) 1 else 3
         }
         return -1
     }

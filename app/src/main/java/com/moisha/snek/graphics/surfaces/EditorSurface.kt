@@ -90,11 +90,8 @@ class EditorSurface constructor(context: Context, withLevel: Boolean = false) : 
     fun resizeLevel(x: Int, y: Int) {
 
         if (!::editor.isInitialized) {
-
             initEditor(x, y)
-
         } else {
-
             val uId: Int = App.getUser()
             val level: Level = editor.getLevel(uId)
 
@@ -108,17 +105,17 @@ class EditorSurface constructor(context: Context, withLevel: Boolean = false) : 
                         break
                     }
                 }
-
                 requestRender()
             }
-
         }
-
-
-
+        
     }
 
     fun saveLevel(name: String = resources.getString(R.string.empty_level_name)) {
+        if (editor.getSnekSize() - 1 < resources.getInteger(R.integer.min_snek_size)) {
+            (context as EditorActivity).error()
+            return
+        }
 
         if (!name.equals(resources.getString(R.string.empty_level_name))) {
 

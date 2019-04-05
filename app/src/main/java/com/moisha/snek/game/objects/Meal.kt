@@ -21,7 +21,7 @@ class Meal {
     }
 
     val isMeal = fun(point: IntArray): Boolean {
-        return point.contentEquals(point)
+        return point.contentEquals(coords)
     }
 
     fun getMeal(): IntArray {

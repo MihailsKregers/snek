@@ -2,7 +2,6 @@ package com.moisha.snek.editor
 
 import com.moisha.snek.database.model.Level
 import com.moisha.snek.editor.internal.EditorFieldInternal
-import com.moisha.snek.global.App
 
 /**
  * Class for handling editor game field
@@ -26,10 +25,10 @@ class EditorField(x: Int, y: Int) : EditorFieldInternal(x, y) {
         //setting direction and snek
         val head: IntArray = level.snek.last()
         when (level.direction) {
-            1 -> if (head[1] == y - 1) field[head[0]][0] = 1 else field[head[0]][head[1] + 1] = 1
-            2 -> if (head[0] == x - 1) field[0][head[1]] = 1 else field[head[0] + 1][head[1]] = 1
-            3 -> if (head[1] == 0) field[head[0]][y - 1] = 1 else field[head[0]][head[1] - 1] = 1
-            4 -> if (head[0] == 0) field[x - 1][head[1]] = 1 else field[head[0] - 1][head[1]] = 1
+            2 -> if (head[1] == y - 1) field[head[0]][0] = 1 else field[head[0]][head[1] + 1] = 1
+            1 -> if (head[0] == x - 1) field[0][head[1]] = 1 else field[head[0] + 1][head[1]] = 1
+            4 -> if (head[1] == 0) field[head[0]][y - 1] = 1 else field[head[0]][head[1] - 1] = 1
+            3 -> if (head[0] == 0) field[x - 1][head[1]] = 1 else field[head[0] - 1][head[1]] = 1
         }
         snekSize = 1
 

@@ -19,7 +19,7 @@ abstract class Game(level: Level, uId: Int) {
 
     private var score = 0
 
-    private var pendingDirection = 0
+    protected var pendingDirection = 0
 
     val checkFree: (IntArray) -> Boolean = fun(point: IntArray): Boolean {
         return (maze.checkBarrier(point) && !snek.onPoint(point))
