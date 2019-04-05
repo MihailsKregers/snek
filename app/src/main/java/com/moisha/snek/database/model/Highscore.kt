@@ -14,7 +14,7 @@ import com.moisha.snek.database.model.Player
         Index(value = arrayOf("id", "uId", "levelId", "score"))
     )
 )
-class Highcore(uId: Int, levelId: Int, score: Int) {
+class Highscore(uId: Int, levelId: Int, score: Int) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
 

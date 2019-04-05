@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
                 when (id.toInt()) {
                     0 -> {
                         //Start game
+                        startActivity(Intent(this@MainActivity, StartGameActivity::class.java))
                     }
                     1 -> {
                         //Highscores
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
                         //Delete level
                     }
                     4 -> {
+                        //New level
                         startActivity(Intent(this@MainActivity, EditorActivity::class.java))
                     }
                     5 -> {

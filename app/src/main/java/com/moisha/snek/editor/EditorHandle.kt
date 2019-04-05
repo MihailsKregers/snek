@@ -5,7 +5,7 @@ import com.moisha.snek.database.model.Level
 class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
 
     //editor field object
-    private /*lateinit*/ var editor: EditorField = EditorField(x, y)
+    private lateinit var editor: EditorField
 
     //actually used action on level
     /**
@@ -45,12 +45,6 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
     //if editor was called for level editing
     constructor(level: Level, sourceX: Int, sourceY: Int) : this(level.size[0], level.size[1], sourceX, sourceY) {
         editor = EditorField(level)
-    }
-
-    //if editor was called with level for resizing
-    constructor(level: Level, x: Int, y: Int, sourceX: Int, sourceY: Int) : this(x, y, sourceX, sourceY) {
-        editor = EditorField(level)
-        editor.changeSize(x, y)
     }
 
     init {
@@ -115,9 +109,15 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
     }
 
     fun getRedrawData(): Array<List<FloatArray>> {
+
+        //lists for squares and their colors in OpenGL coords
         val coords: MutableList<FloatArray> = mutableListOf()
         val colors: MutableList<FloatArray> = mutableListOf()
+
+        //actual field state for drawing
         val field: Array<IntArray> = editor.getField()
+
+        //field reading loop for adding data to drawing arrays
         for (i in 0..field.lastIndex) {
             for (j in 0..field[i].lastIndex) {
                 coords.add(
@@ -186,6 +186,12 @@ class EditorHandle(x: Int, y: Int, sourceX: Int, sourceY: Int) {
 
     //hardcoded menu view
     fun getMenuDrawData(): Array<List<FloatArray>> {
+
+        //when menu draw data requested, editor should be already initialized
+        //initialize it with given xy if it is not
+        if (!::editor.isInitialized) {
+            editor = EditorField(x, y)
+        }
 
         val tr_coords: MutableList<FloatArray> = mutableListOf()
         val tr_colors: MutableList<FloatArray> = mutableListOf()

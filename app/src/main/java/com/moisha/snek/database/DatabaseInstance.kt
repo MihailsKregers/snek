@@ -10,14 +10,14 @@ import com.moisha.snek.database.dao.HighscoreDao
 import com.moisha.snek.database.dao.LevelDao
 import com.moisha.snek.database.dao.PlayerDao
 import com.moisha.snek.database.dao.PlayerLevelDao
-import com.moisha.snek.database.model.Highcore
+import com.moisha.snek.database.model.Highscore
 import com.moisha.snek.database.model.Level
 import com.moisha.snek.database.model.Player
 import com.moisha.snek.database.model.PlayerLevel
 
 @Database(
     version = 1,
-    entities = arrayOf(Level::class, Player::class, Highcore::class, PlayerLevel::class),
+    entities = arrayOf(Level::class, Player::class, Highscore::class, PlayerLevel::class),
     exportSchema = false
 )
 @TypeConverters(LevelConverter::class)

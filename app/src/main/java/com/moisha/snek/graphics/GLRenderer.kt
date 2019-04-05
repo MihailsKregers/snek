@@ -91,7 +91,7 @@ class GLRenderer : GLSurfaceView.Renderer {
         }
     }
 
-    fun redrawMenu() {
+    private fun redrawMenu() {
 
         //draw all sent squares
         for (i in 0..menu[0].lastIndex) {

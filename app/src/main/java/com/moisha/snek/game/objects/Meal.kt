@@ -6,7 +6,7 @@ package com.moisha.snek.game.objects
 
 class Meal {
 
-    var coords: IntArray = IntArray(2)
+    private lateinit var coords: IntArray
 
     //function creates new meal, checking if position is free in the flat by function provided as argument
     fun newMeal(random: () -> IntArray, isFree: (IntArray) -> Boolean) {
@@ -20,8 +20,12 @@ class Meal {
 
     }
 
-    fun isMeal(point: IntArray): Boolean {
+    val isMeal = fun(point: IntArray): Boolean {
         return point.contentEquals(point)
+    }
+
+    fun getMeal(): IntArray {
+        return coords
     }
 
 }

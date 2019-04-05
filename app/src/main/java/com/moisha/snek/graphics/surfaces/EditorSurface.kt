@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.opengl.GLSurfaceView
 import android.view.MotionEvent
-import com.google.gson.Gson
 import com.moisha.snek.R
 import com.moisha.snek.activities.SetLevelNameActivity
 import com.moisha.snek.activities.SetSizeActivity
@@ -18,14 +17,13 @@ import com.moisha.snek.graphics.GLRenderer
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
-class EditorSurface(context: Context, withLevel: Boolean = false) : GLSurfaceView(context) {
+class EditorSurface constructor(context: Context, withLevel: Boolean = false) : GLSurfaceView(context) {
 
+    private var xOffset: Int = 0
     private var yOffset: Int = 0
 
     private val mRenderer: GLRenderer
     private lateinit var editor: EditorHandle
-
-    private val gson: Gson = Gson()
 
     init {
 
@@ -71,7 +69,7 @@ class EditorSurface(context: Context, withLevel: Boolean = false) : GLSurfaceVie
         if (event.action == MotionEvent.ACTION_DOWN) {
             queueEvent(object : Runnable {
                 override fun run() {
-                    action(event.x, event.y - yOffset)
+                    action(event.x - xOffset, event.y - yOffset)
                 }
             })
         }
@@ -227,6 +225,7 @@ class EditorSurface(context: Context, withLevel: Boolean = false) : GLSurfaceVie
 
         val onScrLoc: IntArray = intArrayOf(0, 0)
         getLocationOnScreen(onScrLoc)
+        xOffset = onScrLoc[0]
         yOffset = onScrLoc[1]
 
     }

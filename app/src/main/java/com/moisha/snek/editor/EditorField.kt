@@ -17,19 +17,13 @@ import com.moisha.snek.global.App
 class EditorField(x: Int, y: Int) : EditorFieldInternal(x, y) {
 
     constructor(level: Level) : this(level.size[0], level.size[1]) {
-        //unpacking size
-        x = level.size[0]
-        y = level.size[1]
-
-        //initializing field array
-        this.field = Array(x, { IntArray(y) })
 
         //unpacking barriers
         for (i in level.barriers) {
             setBarrier(i[0], i[1])
         }
 
-        //unpacking snek
+        //setting direction and snek
         val head: IntArray = level.snek.last()
         when (level.direction) {
             1 -> if (head[1] == y - 1) field[head[0]][0] = 1 else field[head[0]][head[1] + 1] = 1
@@ -44,7 +38,9 @@ class EditorField(x: Int, y: Int) : EditorFieldInternal(x, y) {
             field[i[0]][i[1]] = snekSize
         }
 
+        //setting level name
         levelName = level.name
+
     }
 
     fun getField(): Array<IntArray> {

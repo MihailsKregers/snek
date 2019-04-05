@@ -4,24 +4,25 @@ package com.moisha.snek.game.objects
  * Class for handling a snek as game object
  */
 
-import kotlin.math.abs
-
-class Snek(startSnek: Collection<IntArray>) {
+class Snek(startSnek: Collection<IntArray>, startDirection: Int) {
 
     // list of xy coordinates of snek location
     private val state: MutableList<IntArray> = startSnek.toMutableList()
 
     // actual direction of snek moving
-    // 1 - up, 2 - right, 3 - down, 4 - left
-    private var direction: Int = 1 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! - NOT IMPLEMENTED!
+    // 1 - down, 2 - left, 3 - up, 4 - right
+    private var direction: Int = startDirection
 
     // sets new direction, if it is not opposite to actual and not same as actual
     fun setDirection(newDirection: Int) {
-        if (abs(this.direction - newDirection) != 2) {
+        if (allowedDirection(newDirection)) {
             this.direction = newDirection
         }
     }
 
+    fun allowedDirection(direction: Int): Boolean {
+        return (this.direction - direction != 2 && this.direction - direction != -2)
+    }
 
     // moves the snek to the next position, according to actual direction
     // returns true if move was successfull or false if game lost
@@ -30,21 +31,29 @@ class Snek(startSnek: Collection<IntArray>) {
         meal: (IntArray) -> Boolean,
         barCheck: (IntArray) -> Boolean,
         inRoom: (IntArray) -> IntArray
-    ): Boolean {
+    ): Int {
 
         val newHead = inRoom(newHead()) // getting new sneks head position, keeping snek in flat
 
-        if (state.indexOf(newHead) > 0) return false // if snek trying to go over itself - return false
+        for (i in state) {
+            // if snek trying to go over itself - return -1
+            if (i.contentEquals(newHead) && state.indexOf(i) > 0) {
+                return -1
+            }
+        }
 
         // move whole snek or grow to the direction of moving, if meal was eaten
         state.add(newHead)
-        if (!meal(newHead) && !barCheck(newHead)) state.removeAt(0)
+        if (!meal(newHead) && !barCheck(newHead)) {
+            state.removeAt(0)
+            return 0 //not grown up, wasn't meal - return 0
+        }
 
-        return true // all done successfully - return true
+        return 1 // grown up to meal - return 1
     }
 
     private fun newHead(): IntArray {
-        val head: IntArray = state.last()
+        val head: IntArray = state.last().clone()
 
         when (this.direction) { // calculating new sneks head position
             1 -> head[0]++
@@ -54,5 +63,20 @@ class Snek(startSnek: Collection<IntArray>) {
         }
 
         return head
+    }
+
+    fun onPoint(point: IntArray): Boolean {
+
+        for (i in state) {
+            if (i.contentEquals(point)) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    fun getSnek(): List<IntArray> {
+        return state.toList()
     }
 }
