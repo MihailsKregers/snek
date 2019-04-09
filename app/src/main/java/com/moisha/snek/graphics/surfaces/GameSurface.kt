@@ -16,87 +16,87 @@ class GameSurface(context: Context, level: Level) : GLSurfaceView(context) {
     private var xOffset: Int = 0
     private var yOffset: Int = 0
 
-    private val mRenderer: GLRenderer
-    private lateinit var game: GameHandle
+    /* private val mRenderer: GLRenderer
+     private lateinit var game: GameHandle
 
-    init {
+     init {
 
-        setEGLContextClientVersion(2) //OpenGL ES 2.0
+         setEGLContextClientVersion(2) //OpenGL ES 2.0
 
-        mRenderer = GLRenderer()
+         mRenderer = GLRenderer(1) //render with type for game
 
-        setRenderer(mRenderer)
+         setRenderer(mRenderer)
 
-        queueEvent {
-            while (true) {
-                if (width == 0 && height == 0) continue else {
+         queueEvent {
+             while (true) {
+                 if (width == 0 && height == 0) continue else {
 
-                    val uId = App.getUser()
-                    game = GameHandle(level, uId, width, height)
+                     val uId = App.getUser()
+                     game = GameHandle(level, uId, width, height)
 
-                    setRedraw()
+                     setRedraw()
 
-                    break
-                }
-            }
+                     break
+                 }
+             }
 
-            //setting offsets and menu after editor initialized
-            val onScrLoc: IntArray = intArrayOf(0, 0)
-            getLocationOnScreen(onScrLoc)
-            xOffset = onScrLoc[0]
-            yOffset = onScrLoc[1]
+             //setting offsets and menu after editor initialized
+             val onScrLoc: IntArray = intArrayOf(0, 0)
+             getLocationOnScreen(onScrLoc)
+             xOffset = onScrLoc[0]
+             yOffset = onScrLoc[1]
 
-            mRenderer.menu = game.getMenuDrawData()
+             mRenderer.menu = game.getMenuDrawData()
 
-            requestRender()
+             requestRender()
 
-            //after all data set and start state drawn, start game loop
-            gameLoop()
-        }
+             //after all data set and start state drawn, start game loop
+             gameLoop()
+         }
 
-    }
+     }
 
-    private fun setRedraw() {
+     private fun setRedraw() {
 
-        queueEvent {
+         queueEvent {
 
-            val drawData: Array<List<FloatArray>> = game.getRedrawData()
+             val drawData: Array<List<FloatArray>> = game.getRedrawData()
 
-            mRenderer.sq_coords = drawData[0]
-            mRenderer.sq_colors = drawData[1]
+             mRenderer.sq_coords = drawData[0]
+             mRenderer.sq_colors = drawData[1]
 
-            requestRender()
+             requestRender()
 
-        }
+         }
 
-    }
+     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (event.action == MotionEvent.ACTION_DOWN) {
-            queueEvent(object : Runnable {
-                override fun run() {
-                    game.reactOnClick(
-                        (event.x - xOffset).toInt(),
-                        (event.y - yOffset).toInt()
-                    )
-                }
-            })
-        }
+     override fun onTouchEvent(event: MotionEvent): Boolean {
+         if (event.action == MotionEvent.ACTION_DOWN) {
+             queueEvent(object : Runnable {
+                 override fun run() {
+                     game.reactOnClick(
+                         (event.x - xOffset).toInt(),
+                         (event.y - yOffset).toInt()
+                     )
+                 }
+             })
+         }
 
-        return true
-    }
+         return true
+     }
 
-    fun gameLoop() {
-        doAsync {
-            while (game.move()) {
-                uiThread {
-                    setRedraw()
-                }
-                Thread.sleep(1000)
-            }
-            uiThread {
-                (context as GameActivity).finish()
-            }
-        }
-    }
+     fun gameLoop() {
+         doAsync {
+             while (game.move()) {
+                 uiThread {
+                     setRedraw()
+                 }
+                 Thread.sleep(1000)
+             }
+             uiThread {
+                 (context as GameActivity).finish()
+             }
+         }
+     }*/
 }

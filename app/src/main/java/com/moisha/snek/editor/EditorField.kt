@@ -15,6 +15,14 @@ import com.moisha.snek.editor.internal.EditorFieldInternal
 
 class EditorField(x: Int, y: Int) : EditorFieldInternal(x, y) {
 
+    //actually used reaction on field unit touch
+    /**
+     * 1 - set Snek
+     * 2 - set barrier
+     * else - nothing
+     */
+    private var action: Int = 0
+
     constructor(level: Level) : this(level.size[0], level.size[1]) {
 
         //unpacking barriers
@@ -44,6 +52,26 @@ class EditorField(x: Int, y: Int) : EditorFieldInternal(x, y) {
 
     fun getField(): Array<IntArray> {
         return field
+    }
+
+    fun getX(): Int {
+        return this.x
+    }
+
+    fun getY(): Int {
+        return this.y
+    }
+
+    fun setAction(action: Int) {
+        this.action = action
+    }
+
+    fun react(coords: IntArray) {
+        if (action == 1) {
+            setSnek(coords[0], coords[1])
+        } else if (action == 2) {
+            setBarrier(coords[0], coords[1])
+        }
     }
 
     fun setSnek(x: Int, y: Int): Boolean {

@@ -5,44 +5,85 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.opengl.GLSurfaceView
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import com.google.gson.Gson
 import com.moisha.snek.R
+import com.moisha.snek.activities.SetLevelNameActivity
+import com.moisha.snek.activities.SetSizeActivity
+import com.moisha.snek.database.DatabaseInstance
+import com.moisha.snek.database.dao.LevelDao
 import com.moisha.snek.database.model.Level
+import com.moisha.snek.editor.EditorField
+import com.moisha.snek.global.App
 import com.moisha.snek.graphics.surfaces.EditorSurface
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 class EditorActivity : AppCompatActivity() {
 
     companion object {
-        val GET_NAME_REQUEST: Int = 1
-        val GET_SIZE_REQUEST: Int = 2
+        const val GET_NAME_REQUEST: Int = 1
+        const val GET_SIZE_REQUEST: Int = 2
     }
 
     private lateinit var mGLView: EditorSurface
+    private lateinit var editor: EditorField
     private val gson: Gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_editor)
 
-        // if called with level data and new level size for resizing
-        if (intent.hasExtra("level")) { // if called with level for editing
+        mGLView = EditorSurface(
+            this@EditorActivity
+        )
 
-            val level: Level = gson.fromJson(intent.getStringExtra("level"), Level::class.java)
-            mGLView = EditorSurface(
-                this@EditorActivity,
-                level
+        setContentView(mGLView)
+
+        mGLView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY //render only when requested
+
+        if (savedInstanceState?.containsKey("level") ?: false) { //if recreated from existed state
+
+            val jsonEditorField: String = savedInstanceState?.getString("level")!!
+
+            this.editor = gson.fromJson<EditorField>(
+                jsonEditorField,
+                EditorField::class.java
             )
 
-        } else { // if called for new level creation
+        } else if (intent.hasExtra("level")) { // if called with level for editing
 
-            mGLView = EditorSurface(this@EditorActivity)
+            val level: Level = gson.fromJson(intent.getStringExtra("level"), Level::class.java)
+            editor = EditorField(level)
+
+
+        } else { // if called for new level creation - ask size
+
+            val intent = Intent(
+                this@EditorActivity,
+                SetSizeActivity::class.java
+            )
+
+            startActivityForResult(intent, EditorActivity.GET_SIZE_REQUEST)
 
         }
 
-        setContentView(mGLView)
-        mGLView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
+        if (::editor.isInitialized) { //if editor successfully initialized, draw contents after view is set
+
+            draw()
+
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+
+        if (::editor.isInitialized) {
+            outState?.putString(
+                "level",
+                gson.toJson(editor)
+            )
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -52,7 +93,7 @@ class EditorActivity : AppCompatActivity() {
             if (requestCode == GET_NAME_REQUEST) {
                 if (data?.hasExtra("name") ?: false) {
 
-                    mGLView.saveLevel(
+                    saveLevel(
                         data?.getStringExtra("name") ?: resources.getString(R.string.empty_level_name)
                     )
 
@@ -61,25 +102,30 @@ class EditorActivity : AppCompatActivity() {
 
                 if (data?.hasExtra("x") ?: false && data?.hasExtra("y") ?: false) {
 
-                    mGLView.resizeLevel(
-                        data?.getIntExtra(
-                            "x",
-                            resources.getInteger(R.integer.min_level_width)
-                        ) ?: resources.getInteger(R.integer.min_level_width),
-                        data?.getIntExtra(
-                            "y",
-                            resources.getInteger(R.integer.min_level_height)
-                        ) ?: resources.getInteger(R.integer.min_level_height)
-                    )
+                    val x: Int = data?.getIntExtra(
+                        "x",
+                        resources.getInteger(R.integer.min_level_width)
+                    ) ?: resources.getInteger(R.integer.min_level_width)
+                    val y: Int = data?.getIntExtra(
+                        "y",
+                        resources.getInteger(R.integer.min_level_height)
+                    ) ?: resources.getInteger(R.integer.min_level_height)
+
+                    if (::editor.isInitialized) {
+                        editor.changeSize(x, y)
+                    } else {
+                        editor = EditorField(x, y)
+                    }
 
                 }
+
+                draw()
+
             }
         }
     }
 
     fun error() {
-        println("YEAP")
-
         this.runOnUiThread {
             val builder: AlertDialog.Builder = AlertDialog.Builder(this)
             builder.setMessage(R.string.snek_size_error)
@@ -92,6 +138,116 @@ class EditorActivity : AppCompatActivity() {
 
             error.show()
         }
+    }
+
+    fun action(coords: IntArray) {
+
+        if (coords[0] == -1) {
+            when (coords[1]) {
+                1 -> {
+
+                    editor.setAction(coords[1])
+                }
+                2 -> {
+                    editor.setAction(coords[1])
+                }
+                3 -> {
+                    editor.clearSnek()
+                }
+                4 -> {
+                    editor.clearBarriers()
+                }
+                5 -> {
+                    changeSize()
+                }
+                6 -> {
+                    saveLevel()
+                }
+            }
+        } else {
+            editor.react(coords)
+        }
+
+        draw()
+    }
+
+    private fun changeSize() {
+
+        val getSizeIntent = Intent(
+            this@EditorActivity,
+            SetSizeActivity::class.java
+        )
+
+        getSizeIntent.putExtra("x", editor.getX())
+        getSizeIntent.putExtra("y", editor.getY())
+
+        startActivityForResult(getSizeIntent, EditorActivity.GET_SIZE_REQUEST)
+
+        return
+
+    }
+
+    private fun saveLevel(name: String = resources.getString(R.string.empty_level_name)) {
+        if (editor.getSnekSize() - 1 < resources.getInteger(R.integer.min_snek_size)) {
+            error()
+            return
+        }
+
+        if (!name.equals(resources.getString(R.string.empty_level_name))) {
+
+            editor.levelName = name
+
+        }
+
+        if (editor.levelName.equals(resources.getString(R.string.empty_level_name))) {
+
+            val getNameIntent = Intent(
+                this@EditorActivity,
+                SetLevelNameActivity::class.java
+            )
+
+            startActivityForResult(getNameIntent, EditorActivity.GET_NAME_REQUEST)
+
+        } else {
+
+            val uId = App.getUser()
+            val level: Level = editor.getLevel(uId)
+
+            doAsync {
+
+                val lvldao: LevelDao = DatabaseInstance.getInstance(this@EditorActivity).levelDao()
+
+                if (lvldao.nameUsed(level.name) > 0) {
+
+                    level.id = lvldao.getIdByName(level.name)
+                    lvldao.updateLevels(level)
+
+                } else {
+
+                    lvldao.insert(level)
+
+                }
+
+                uiThread {
+
+                    finish()
+
+                }
+            }
+        }
+
+        return
+
+    }
+
+    fun draw(): Boolean {
+        if (::mGLView.isInitialized) {
+            mGLView.redrawField(
+                editor.getField()
+            )
+            return true
+        }
+        return false
     }
 
 }

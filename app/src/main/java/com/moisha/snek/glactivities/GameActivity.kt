@@ -17,21 +17,21 @@ class GameActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
-        if (intent.hasExtra("level")) { // if called with level to play
+        /* if (intent.hasExtra("level")) { // if called with level to play
 
-            val level: Level = gson.fromJson(intent.getStringExtra("level"), Level::class.java)
-            mGLView = GameSurface(
-                this@GameActivity,
-                level
-            )
+             val level: Level = gson.fromJson(intent.getStringExtra("level"), Level::class.java)
+             mGLView = GameSurface(
+                 this@GameActivity,
+                 level
+             )
 
-        } else { // if no level
+         } else { // if no level
 
-            finish()
+             finish()
 
-        }
+         }
 
-        setContentView(mGLView)
-        mGLView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
+         setContentView(mGLView)
+         mGLView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY*/
     }
 }

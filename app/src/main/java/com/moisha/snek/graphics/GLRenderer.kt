@@ -1,20 +1,46 @@
 package com.moisha.snek.graphics
 
+import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
+import com.moisha.snek.editor.EditorField
 import com.moisha.snek.graphics.shapes.Square
 import com.moisha.snek.graphics.shapes.Triangle
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class GLRenderer : GLSurfaceView.Renderer {
+class GLRenderer(type: Int) : GLSurfaceView.Renderer {
     private lateinit var square: Square
     private lateinit var triangle: Triangle
 
-    var sq_coords: List<FloatArray> = listOf()
-    var sq_colors: List<FloatArray> = listOf()
-    var tr_coords: List<FloatArray> = listOf()
-    var tr_colors: List<FloatArray> = listOf()
+    //identifier to know is it game or editor - what menu to draw
+    // 1 - game, 2 - editor
+    private var renderType: Int = type
+
+    //field size in drawable units
+    private var fieldX: Int = 1
+    private var fieldY: Int = 1
+
+    //drawable area size in pixels
+    private var sourceX: Int = 0
+    private var sourceY: Int = 0
+
+    //single field unit size in OpenGL coords
+    private var partSizeX: Float = 0.0f
+    private var partSizeY: Float = 0.0f
+
+    //menu block height in OpenGL coords and pixels
+    private var menuSizeY: Float = 0.0f
+    private var menuSizeYpt: Int = 0
+
+    //single field unit size in pixels
+    private var partPt: Int = 0
+
+    //field offsets by x on screen in OpenGL coords and pixels
+    private var xOffsetPt: Int = 0
+    private var xOffset: Float = 0.0f
+
+    var squares: List<Array<FloatArray>> = listOf()
 
     var menu: Array<List<FloatArray>> = arrayOf()
 
@@ -44,6 +70,12 @@ class GLRenderer : GLSurfaceView.Renderer {
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
+
+        sourceX = width
+        sourceY = height
+
+        calcTransform()
+        setMenu()
     }
 
     override fun onDrawFrame(gl: GL10?) {
@@ -53,14 +85,12 @@ class GLRenderer : GLSurfaceView.Renderer {
         //redraw menu
         redrawMenu()
 
-        //draw all sent squares
-        for (i in 0..sq_coords.lastIndex) {
-            square.draw(sq_coords.get(i), sq_colors.get(i))
-        }
-
-        //draw all sent triangles
-        for (i in 0..tr_coords.lastIndex) {
-            triangle.draw(tr_coords.get(i), tr_colors.get(i))
+        //draw all pending squares
+        for (i in squares) {
+            square.draw(
+                i[0], //coords
+                i[1] //color
+            )
         }
     }
 
@@ -102,6 +132,356 @@ class GLRenderer : GLSurfaceView.Renderer {
         for (i in 0..menu[2].lastIndex) {
             triangle.draw(menu[2].get(i), menu[3].get(i))
         }
+    }
+
+    fun redrawField(field: Array<IntArray>) {
+
+        //if field size was changed - recalculate sizes and offsets in OpenGL coords
+        if (field.size != fieldX || field[0].size != fieldY) {
+            this.fieldX = field.size
+            this.fieldY = field[0].size
+            calcTransform()
+        }
+
+        //list for squares and their colors in OpenGL coords
+        val squares: MutableList<Array<FloatArray>> = mutableListOf()
+
+        //field reading loop for adding data to drawing arrays
+        for (i in 0..field.lastIndex) {
+            for (j in 0..field[i].lastIndex) {
+                val square =
+                    Array(
+                        2,
+                        { floatArrayOf() }
+                    )
+                square[0] =
+                    floatArrayOf(
+                        xOffset + -1.0f + partSizeX * i, 1.0f - partSizeY * j - partSizeY,
+                        xOffset + -1.0f + partSizeX * i, 1.0f - partSizeY * j,
+                        xOffset + -1.0f + partSizeX * i + partSizeX, 1.0f - partSizeY * j,
+                        xOffset + -1.0f + partSizeX * i + partSizeX, 1.0f - partSizeY * j - partSizeY
+                    )
+                when (field[i][j]) {
+                    0 -> {
+                        square[1] =
+                            floatArrayOf(1.0f, 1.0f, 1.0f, 1.0f)
+                    }
+                    1 -> {
+                        square[1] =
+                            floatArrayOf(1.0f, 0.0f, 0.0f, 1.0f)
+                    }
+                    -1 -> {
+                        square[1] =
+                            floatArrayOf(0.0f, 0.0f, 0.0f, 1.0f)
+                    }
+                    else -> {
+                        square[1] =
+                            floatArrayOf(0.0f, 0.0f, 1.0f, 1.0f)
+                    }
+                }
+                squares.add(square)
+            }
+        }
+
+        this.squares = squares.toList()
+    }
+
+    //determine on what unit was clicked
+    fun traceClick(xTouch: Int, yTouch: Int): IntArray {
+        val coords = IntArray(2, { -1 })
+
+        if (yTouch > sourceY - menuSizeYpt) {
+            if (xTouch < sourceX / 6) {
+                println("1 SET")
+                coords[1] = 1
+            } else if (xTouch < sourceX / 6 * 2) {
+                println("2 SET")
+                coords[1] = 2
+            } else if (xTouch < sourceX / 6 * 3) {
+                println("3 SET")
+                coords[1] = 3
+            } else if (xTouch < sourceX / 6 * 4) {
+                println("4 SET")
+                coords[1] = 4
+            } else if (xTouch < sourceX / 6 * 5) {
+                println("5 SET")
+                coords[1] = 5
+            } else {
+                println("6 SET")
+                coords[1] = 6
+            }
+        } else if (renderType == 2) { //only if editor, in game this area is not needed to listen
+            if (xTouch >= xOffsetPt && xTouch <= xOffsetPt + partPt * fieldX && yTouch <= partPt * fieldY) {
+                coords[0] = (xTouch - xOffsetPt) / partPt
+                coords[1] = yTouch / partPt
+            }
+        }
+
+        return coords
+    }
+
+    private fun calcTransform() {
+        menuSizeY = (2.0f / sourceY.toFloat()) * sourceX.toFloat() / 6.0f
+
+        menuSizeYpt = (menuSizeY * sourceY.toFloat() / 2.0f).toInt()
+
+        val freeSizeYpt: Int = sourceY - sourceX / 6
+        if (freeSizeYpt / fieldY < sourceX / fieldX) {
+            partSizeY = (2.0f - menuSizeY) / fieldY.toFloat()
+            partSizeX = partSizeY / sourceX.toFloat() * sourceY.toFloat()
+        } else {
+            partSizeX = 2.0f / fieldX.toFloat()
+            partSizeY = partSizeX / sourceY.toFloat() * sourceX.toFloat()
+        }
+
+        partPt = (partSizeY / 2 * sourceY).toInt()
+
+        xOffset = (2.0f - partSizeX * fieldX) / 2
+        xOffsetPt = (sourceX - (partPt * fieldX)) / 2
+    }
+
+    //hardcoded menu views
+    private fun setMenu() {
+
+        val tr_coords: MutableList<FloatArray> = mutableListOf()
+        val tr_colors: MutableList<FloatArray> = mutableListOf()
+        val sq_coords: MutableList<FloatArray> = mutableListOf()
+        val sq_colors: MutableList<FloatArray> = mutableListOf()
+
+        val buttonSizeX: Float = 2.0f / 6.0f
+
+        if (renderType == 1) { //game menu
+
+            //menu background
+            sq_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX, -1.0f,
+                    -1.0f + buttonSizeX, -1.0f + menuSizeY,
+                    1.0f - buttonSizeX, -1.0f + menuSizeY,
+                    1.0f - buttonSizeX, -1.0f
+                )
+            )
+            sq_colors.add(
+                floatArrayOf(0.0f, 1.0f, 1.0f, 1.0f)
+            )
+
+            //left
+            tr_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX * 1.9f, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 1.1f, -1.0f + (menuSizeY / 2),
+                    -1.0f + buttonSizeX * 1.9f, -1.0f
+                )
+            )
+            tr_colors.add(
+                floatArrayOf(
+                    1.0f, 1.0f, 0.0f, 1.0f
+                )
+            )
+
+            //down
+            tr_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX * 2, -1.0f + (menuSizeY * 0.9f),
+                    -1.0f + buttonSizeX * 2.5f, -1.0f + (menuSizeY * 0.1f),
+                    -1.0f + buttonSizeX * 3, -1.0f + (menuSizeY * 0.9f)
+                )
+            )
+            tr_colors.add(
+                floatArrayOf(
+                    1.0f, 1.0f, 0.0f, 1.0f
+                )
+            )
+
+            //up
+            tr_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX * 3, -1.0f + (menuSizeY * 0.1f),
+                    -1.0f + buttonSizeX * 3.5f, -1.0f + (menuSizeY * 0.9f),
+                    -1.0f + buttonSizeX * 4, -1.0f + (menuSizeY * 0.1f)
+                )
+            )
+            tr_colors.add(
+                floatArrayOf(
+                    1.0f, 1.0f, 0.0f, 1.0f
+                )
+            )
+
+            //right
+            tr_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX * 4.1f, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 4.9f, -1.0f + (menuSizeY / 2),
+                    -1.0f + buttonSizeX * 4.1f, -1.0f
+                )
+            )
+            tr_colors.add(
+                floatArrayOf(
+                    1.0f, 1.0f, 0.0f, 1.0f
+                )
+            )
+
+        } else if (renderType == 2) { //editor menu
+
+            //adding Snek edit button
+            sq_coords.add(
+                floatArrayOf(
+                    -1.0f, -1.0f,
+                    -1.0f, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX, -1.0f
+                )
+            )
+            sq_colors.add(
+                floatArrayOf(
+                    0.0f, 0.0f, 1.0f, 1.0f
+                )
+            )
+
+            //adding barrier edit button
+            sq_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX, -1.0f,
+                    -1.0f + buttonSizeX, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 2, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 2, -1.0f
+                )
+            )
+            sq_colors.add(
+                floatArrayOf(
+                    0.0f, 0.0f, 0.0f, 1.0f
+                )
+            )
+
+            //adding clear Snek button
+            sq_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX * 2, -1.0f,
+                    -1.0f + buttonSizeX * 2, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 3, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 3, -1.0f
+                )
+            )
+            sq_colors.add(
+                floatArrayOf(
+                    0.0f, 0.0f, 1.0f, 1.0f
+                )
+            )
+            tr_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX * 2, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 3, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 2.5f, -1.0f
+                )
+            )
+            tr_colors.add(
+                floatArrayOf(
+                    1.0f, 1.0f, 0.0f, 1.0f
+                )
+            )
+
+            //adding clear barriers button
+            sq_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX * 3, -1.0f,
+                    -1.0f + buttonSizeX * 3, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 4, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 4, -1.0f
+                )
+            )
+            sq_colors.add(
+                floatArrayOf(
+                    0.0f, 0.0f, 0.0f, 1.0f
+                )
+            )
+            tr_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX * 3, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 4, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 3.5f, -1.0f
+                )
+            )
+            tr_colors.add(
+                floatArrayOf(
+                    1.0f, 1.0f, 0.0f, 1.0f
+                )
+            )
+
+            //adding clear Snek button
+            sq_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX * 4, -1.0f,
+                    -1.0f + buttonSizeX * 4, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 5, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 5, -1.0f
+                )
+            )
+            sq_colors.add(
+                floatArrayOf(
+                    1.0f, 0.0f, 1.0f, 1.0f
+                )
+            )
+            tr_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX * 4, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 5, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 4.5f, -1.0f + (menuSizeY / 2)
+                )
+            )
+            tr_colors.add(
+                floatArrayOf(
+                    1.0f, 1.0f, 0.0f, 1.0f
+                )
+            )
+            tr_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX * 4, -1.0f,
+                    -1.0f + buttonSizeX * 5, -1.0f,
+                    -1.0f + buttonSizeX * 4.5f, -1.0f + (menuSizeY / 2)
+                )
+            )
+            tr_colors.add(
+                floatArrayOf(
+                    1.0f, 1.0f, 0.0f, 1.0f
+                )
+            )
+
+            //adding save button
+            sq_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX * 5, -1.0f,
+                    -1.0f + buttonSizeX * 5, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 6, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 6, -1.0f
+                )
+            )
+            sq_colors.add(
+                floatArrayOf(
+                    0.0f, 0.0f, 0.0f, 1.0f
+                )
+            )
+            tr_coords.add(
+                floatArrayOf(
+                    -1.0f + buttonSizeX * 5.2f, -1.0f + menuSizeY,
+                    -1.0f + buttonSizeX * 6, -1.0f + (menuSizeY / 2),
+                    -1.0f + buttonSizeX * 5.2f, -1.0f
+                )
+            )
+            tr_colors.add(
+                floatArrayOf(
+                    0.0f, 1.0f, 0.0f, 1.0f
+                )
+            )
+
+        }
+
+        //store calculated data for rendering
+        menu = arrayOf(
+            sq_coords.toList(),
+            sq_colors.toList(),
+            tr_coords.toList(),
+            tr_colors.toList()
+        )
     }
 
 }
