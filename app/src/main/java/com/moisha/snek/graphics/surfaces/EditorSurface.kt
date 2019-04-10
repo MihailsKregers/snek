@@ -3,6 +3,7 @@ package com.moisha.snek.graphics.surfaces
 import android.content.Context
 import android.opengl.GLSurfaceView
 import android.view.MotionEvent
+import android.view.View
 import com.moisha.snek.glactivities.EditorActivity
 import com.moisha.snek.graphics.GLRenderer
 
@@ -15,25 +16,16 @@ class EditorSurface constructor(context: Context) : GLSurfaceView(context) {
 
         setEGLContextClientVersion(2) //OpenGL ES 2.0
 
-        mRenderer = GLRenderer(2)
+        mRenderer = GLRenderer(GLRenderer.TYPE_EDITOR_RENDER, editorActivity.getField)
 
         setRenderer(mRenderer)
 
-        queueEvent {
-            while (true) {
-                if (width > 0 && height > 0) {
-                    while (!editorActivity.draw()) {
-                        continue
-                    }
-                    break
-                }
-            }
-            requestRender()
-        }
+        renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY //render only when requested
 
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+
         if (event.action == MotionEvent.ACTION_DOWN) {
             queueEvent(
                 object : Runnable {
@@ -53,11 +45,6 @@ class EditorSurface constructor(context: Context) : GLSurfaceView(context) {
         }
 
         return true
-    }
-
-    fun redrawField(field: Array<IntArray>) {
-        mRenderer.redrawField(field)
-        requestRender()
     }
 
 }

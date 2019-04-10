@@ -15,6 +15,10 @@ import com.moisha.snek.editor.internal.EditorFieldInternal
 
 class EditorField(x: Int, y: Int) : EditorFieldInternal(x, y) {
 
+    companion object {
+        const val ACTION_SET_SNEK = 1
+        const val ACTION_SET_BARRIER = 2
+    }
     //actually used reaction on field unit touch
     /**
      * 1 - set Snek

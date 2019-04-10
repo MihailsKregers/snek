@@ -7,19 +7,39 @@ import com.moisha.snek.database.model.Level
  * Main game handler class.
  */
 
-abstract class Game(level: Level, uId: Int) {
+class Game(level: Level, uId: Int) {
+
+    companion object {
+        const val DIRECTION_RIGHT = 1
+        const val DIRECTION_DOWN = 2
+        const val DIRECTOPN_LEFT = 3
+        const val DIRECTION_UP = 4
+        const val BARRIER = -1
+        const val EMPTY_UNIT = 0
+        const val MEAL = -2
+        const val DIRECTION = 1
+        const val SNEK_FROM = 2
+    }
+
+    const val emptyField: Array<IntArray> = Array(level.size[0], { IntArray(level.size[1]) })
 
     private val uId: Int = uId
     private val id: Int = level.id
 
     private val flat: Flat = Flat(level.size[0], level.size[1])
-    protected val maze: Maze = Maze(level.barriers)
-    protected val meal: Meal = Meal()
-    protected val snek: Snek = Snek(level.snek, level.direction)
+    private val maze: Maze = Maze(level.barriers)
+    private val meal: Meal = Meal()
+    private val snek: Snek = Snek(level.snek, level.direction)
 
     private var score = 0
 
-    protected var pendingDirection = 0
+    private var pendingDirection = 0
+
+    init {
+        for (barrier in level.barriers) {
+            emptyField[barrier[0]][barrier[1]] = -1
+        }
+    }
 
     val checkFree: (IntArray) -> Boolean = fun(point: IntArray): Boolean {
         return (maze.checkBarrier(point) && !snek.onPoint(point))
@@ -27,6 +47,20 @@ abstract class Game(level: Level, uId: Int) {
 
     init {
         meal.newMeal(flat.randomPoint, checkFree)
+    }
+
+    fun getField(): Array<IntArray> {
+        val field: Array<IntArray> = Array(
+            emptyField.size,
+            { index: Int ->
+                emptyField[index].copyOf()
+            }
+        )
+
+        val snek: List<IntArray> = this.snek.getSnek()
+        for (i in snek) {
+            field[i[0]][i[1]] =
+        }
     }
 
     fun move(): Boolean {
@@ -61,6 +95,12 @@ abstract class Game(level: Level, uId: Int) {
         val result: Highscore = Highscore(uId, id, score)
 
         return result
+    }
+
+    fun setDirection(direction: Int) {
+        if (snek.allowedDirection(direction)) {
+            this.pendingDirection = direction
+        }
     }
 
 }

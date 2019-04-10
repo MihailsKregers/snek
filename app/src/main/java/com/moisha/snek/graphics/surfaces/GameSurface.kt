@@ -16,87 +16,98 @@ class GameSurface(context: Context, level: Level) : GLSurfaceView(context) {
     private var xOffset: Int = 0
     private var yOffset: Int = 0
 
-    /* private val mRenderer: GLRenderer
-     private lateinit var game: GameHandle
+    private val gameActivity: GameActivity = context as GameActivity
+    private val mRenderer: GLRenderer
+    private lateinit var game: GameHandle
 
-     init {
+    init {
 
-         setEGLContextClientVersion(2) //OpenGL ES 2.0
+        setEGLContextClientVersion(2) //OpenGL ES 2.0
 
-         mRenderer = GLRenderer(1) //render with type for game
+        mRenderer = GLRenderer(1, {}) //render with type for game
 
-         setRenderer(mRenderer)
+        setRenderer(mRenderer)
 
-         queueEvent {
-             while (true) {
-                 if (width == 0 && height == 0) continue else {
+        renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
 
-                     val uId = App.getUser()
-                     game = GameHandle(level, uId, width, height)
+        queueEvent {
+            while (true) {
+                if (width == 0 && height == 0) continue else {
 
-                     setRedraw()
+                    val uId = App.getUser()
+                    game = GameHandle(level, uId, width, height)
 
-                     break
-                 }
-             }
+                    setRedraw()
 
-             //setting offsets and menu after editor initialized
-             val onScrLoc: IntArray = intArrayOf(0, 0)
-             getLocationOnScreen(onScrLoc)
-             xOffset = onScrLoc[0]
-             yOffset = onScrLoc[1]
+                    break
+                }
+            }
 
-             mRenderer.menu = game.getMenuDrawData()
+            //setting offsets and menu after editor initialized
+            val onScrLoc: IntArray = intArrayOf(0, 0)
+            getLocationOnScreen(onScrLoc)
+            xOffset = onScrLoc[0]
+            yOffset = onScrLoc[1]
 
-             requestRender()
+            mRenderer.menu = game.getMenuDrawData()
 
-             //after all data set and start state drawn, start game loop
-             gameLoop()
-         }
+            requestRender()
 
-     }
+            //after all data set and start state drawn, start game loop
+            gameLoop()
+        }
 
-     private fun setRedraw() {
+    }
 
-         queueEvent {
+    private fun setRedraw() {
 
-             val drawData: Array<List<FloatArray>> = game.getRedrawData()
+        queueEvent {
 
-             mRenderer.sq_coords = drawData[0]
-             mRenderer.sq_colors = drawData[1]
+            val drawData: Array<List<FloatArray>> = game.getRedrawData()
 
-             requestRender()
+            mRenderer.sq_coords = drawData[0]
+            mRenderer.sq_colors = drawData[1]
 
-         }
+            requestRender()
 
-     }
+        }
 
-     override fun onTouchEvent(event: MotionEvent): Boolean {
-         if (event.action == MotionEvent.ACTION_DOWN) {
-             queueEvent(object : Runnable {
-                 override fun run() {
-                     game.reactOnClick(
-                         (event.x - xOffset).toInt(),
-                         (event.y - yOffset).toInt()
-                     )
-                 }
-             })
-         }
+    }
 
-         return true
-     }
+    override fun onTouchEvent(event: MotionEvent): Boolean {
 
-     fun gameLoop() {
-         doAsync {
-             while (game.move()) {
-                 uiThread {
-                     setRedraw()
-                 }
-                 Thread.sleep(1000)
-             }
-             uiThread {
-                 (context as GameActivity).finish()
-             }
-         }
-     }*/
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            queueEvent(
+                object : Runnable {
+                    override fun run() {
+                        val onScrLoc: IntArray = intArrayOf(0, 0)
+                        getLocationOnScreen(onScrLoc)
+
+                        gameActivity.action(
+                            mRenderer.traceClick(
+                                event.x.toInt() - onScrLoc[0],
+                                event.y.toInt() - onScrLoc[1]
+                            )
+                        )
+                    }
+                }
+            )
+        }
+
+        return true
+    }
+
+    fun gameLoop() {
+        doAsync {
+            while (game.move()) {
+                uiThread {
+                    setRedraw()
+                }
+                Thread.sleep(1000)
+            }
+            uiThread {
+                (context as GameActivity).finish()
+            }
+        }
+    }
 }

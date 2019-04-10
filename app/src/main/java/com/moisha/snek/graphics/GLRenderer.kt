@@ -1,17 +1,23 @@
 package com.moisha.snek.graphics
 
-import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
-import com.moisha.snek.editor.EditorField
+import com.moisha.snek.game.objects.Game
 import com.moisha.snek.graphics.shapes.Square
 import com.moisha.snek.graphics.shapes.Triangle
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class GLRenderer(type: Int) : GLSurfaceView.Renderer {
+class GLRenderer(type: Int, getDrawData: () -> Array<IntArray>) : GLSurfaceView.Renderer {
+
+    companion object {
+        const val TYPE_GAME_RENDER: Int = 1
+        const val TYPE_EDITOR_RENDER: Int = 2
+    }
+
     private lateinit var square: Square
     private lateinit var triangle: Triangle
+    private val getDrawData: () -> Array<IntArray> = getDrawData
 
     //identifier to know is it game or editor - what menu to draw
     // 1 - game, 2 - editor
@@ -40,9 +46,28 @@ class GLRenderer(type: Int) : GLSurfaceView.Renderer {
     private var xOffsetPt: Int = 0
     private var xOffset: Float = 0.0f
 
-    var squares: List<Array<FloatArray>> = listOf()
+    //play button sizes in OpenGL coords
+    private var pButtonSizeX: Float = 0.0f
+    private var pButtonSizeY: Float = 0.0f
 
-    var menu: Array<List<FloatArray>> = arrayOf()
+    private var squares: List<Array<FloatArray>> = listOf()
+
+    private var menu: Array<List<FloatArray>> = arrayOf()
+
+    private val vertexShaderCode =
+        "attribute vec4 vPosition;" +
+                "void main() {" +
+                "  gl_Position = vPosition;" +
+                "}"
+
+    private val fragmentShaderCode =
+        "precision mediump float;" +
+                "uniform vec4 vColor;" +
+                "void main() {" +
+                "  gl_FragColor = vColor;" +
+                "}"
+
+    private var mProgram: Int = 0
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         GLES20.glClearColor(0.7f, 0.7f, 0.7f, 1.0f)
@@ -85,6 +110,11 @@ class GLRenderer(type: Int) : GLSurfaceView.Renderer {
         //redraw menu
         redrawMenu()
 
+        //get drawing data
+        redrawField(
+            getDrawData()
+        )
+
         //draw all pending squares
         for (i in squares) {
             square.draw(
@@ -93,21 +123,6 @@ class GLRenderer(type: Int) : GLSurfaceView.Renderer {
             )
         }
     }
-
-    private val vertexShaderCode =
-        "attribute vec4 vPosition;" +
-                "void main() {" +
-                "  gl_Position = vPosition;" +
-                "}"
-
-    private val fragmentShaderCode =
-        "precision mediump float;" +
-                "uniform vec4 vColor;" +
-                "void main() {" +
-                "  gl_FragColor = vColor;" +
-                "}"
-
-    private var mProgram: Int = 0
 
     fun loadShader(type: Int, shaderCode: String): Int {
 
@@ -129,7 +144,9 @@ class GLRenderer(type: Int) : GLSurfaceView.Renderer {
         }
 
         //draw all sent triangles
-        for (i in 0..menu[2].lastIndex) {
+        for (i in 0..
+                (if (hasSquares()) menu[2].lastIndex - 1
+                else menu[2].lastIndex)) {
             triangle.draw(menu[2].get(i), menu[3].get(i))
         }
     }
@@ -162,17 +179,21 @@ class GLRenderer(type: Int) : GLSurfaceView.Renderer {
                         xOffset + -1.0f + partSizeX * i + partSizeX, 1.0f - partSizeY * j - partSizeY
                     )
                 when (field[i][j]) {
-                    0 -> {
+                    Game.EMPTY_UNIT -> {
                         square[1] =
                             floatArrayOf(1.0f, 1.0f, 1.0f, 1.0f)
                     }
-                    1 -> {
+                    Game.DIRECTION -> {
                         square[1] =
                             floatArrayOf(1.0f, 0.0f, 0.0f, 1.0f)
                     }
-                    -1 -> {
+                    Game.BARRIER -> {
                         square[1] =
                             floatArrayOf(0.0f, 0.0f, 0.0f, 1.0f)
+                    }
+                    Game.MEAL -> {
+                        square[1] =
+                            floatArrayOf(1.0f, 1.0f, 0.0f, 1.0f)
                     }
                     else -> {
                         square[1] =
@@ -192,25 +213,19 @@ class GLRenderer(type: Int) : GLSurfaceView.Renderer {
 
         if (yTouch > sourceY - menuSizeYpt) {
             if (xTouch < sourceX / 6) {
-                println("1 SET")
                 coords[1] = 1
             } else if (xTouch < sourceX / 6 * 2) {
-                println("2 SET")
                 coords[1] = 2
             } else if (xTouch < sourceX / 6 * 3) {
-                println("3 SET")
                 coords[1] = 3
             } else if (xTouch < sourceX / 6 * 4) {
-                println("4 SET")
                 coords[1] = 4
             } else if (xTouch < sourceX / 6 * 5) {
-                println("5 SET")
                 coords[1] = 5
             } else {
-                println("6 SET")
                 coords[1] = 6
             }
-        } else if (renderType == 2) { //only if editor, in game this area is not needed to listen
+        } else if (renderType == TYPE_EDITOR_RENDER) { //not needed to react
             if (xTouch >= xOffsetPt && xTouch <= xOffsetPt + partPt * fieldX && yTouch <= partPt * fieldY) {
                 coords[0] = (xTouch - xOffsetPt) / partPt
                 coords[1] = yTouch / partPt
@@ -226,6 +241,8 @@ class GLRenderer(type: Int) : GLSurfaceView.Renderer {
         menuSizeYpt = (menuSizeY * sourceY.toFloat() / 2.0f).toInt()
 
         val freeSizeYpt: Int = sourceY - sourceX / 6
+
+        //field unit sizes calculation
         if (freeSizeYpt / fieldY < sourceX / fieldX) {
             partSizeY = (2.0f - menuSizeY) / fieldY.toFloat()
             partSizeX = partSizeY / sourceX.toFloat() * sourceY.toFloat()
@@ -236,6 +253,16 @@ class GLRenderer(type: Int) : GLSurfaceView.Renderer {
 
         partPt = (partSizeY / 2 * sourceY).toInt()
 
+        //play button size calculation
+        if (freeSizeYpt < sourceX) {
+            pButtonSizeY = (2.0f - menuSizeY) / 2
+            pButtonSizeX = pButtonSizeY / sourceX.toFloat() * sourceY.toFloat()
+        } else {
+            pButtonSizeX = 1.0f
+            pButtonSizeY = pButtonSizeX / sourceY.toFloat() * sourceX.toFloat()
+        }
+
+        //x margins to draw field centered horizontally
         xOffset = (2.0f - partSizeX * fieldX) / 2
         xOffsetPt = (sourceX - (partPt * fieldX)) / 2
     }
@@ -475,6 +502,18 @@ class GLRenderer(type: Int) : GLSurfaceView.Renderer {
 
         }
 
+        //play button - in the end of triangle list
+        tr_coords.add(
+            floatArrayOf(
+                0.0f - pButtonSizeX / 2.0f, 1.0f - ((2.0f - menuSizeY) / 2) + pButtonSizeY / 2.0f,
+                0.0f + pButtonSizeX / 2.0f, 1.0f - ((2.0f - menuSizeY) / 2),
+                0.0f - pButtonSizeX / 2.0f, 1.0f - ((2.0f - menuSizeY) / 2) - pButtonSizeY / 2.0f
+            )
+        )
+        tr_colors.add(
+            floatArrayOf(0.0f, 1.0f, 0.0f, 1.0f)
+        )
+
         //store calculated data for rendering
         menu = arrayOf(
             sq_coords.toList(),
@@ -482,6 +521,10 @@ class GLRenderer(type: Int) : GLSurfaceView.Renderer {
             tr_coords.toList(),
             tr_colors.toList()
         )
+    }
+
+    private fun hasSquares(): Boolean {
+        return squares.isNotEmpty()
     }
 
 }

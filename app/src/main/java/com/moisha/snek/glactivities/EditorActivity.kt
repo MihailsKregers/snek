@@ -40,8 +40,6 @@ class EditorActivity : AppCompatActivity() {
 
         setContentView(mGLView)
 
-        mGLView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY //render only when requested
-
         if (savedInstanceState?.containsKey("level") ?: false) { //if recreated from existed state
 
             val jsonEditorField: String = savedInstanceState?.getString("level")!!
@@ -70,7 +68,7 @@ class EditorActivity : AppCompatActivity() {
 
         if (::editor.isInitialized) { //if editor successfully initialized, draw contents after view is set
 
-            draw()
+            mGLView.requestRender()
 
         }
     }
@@ -117,9 +115,8 @@ class EditorActivity : AppCompatActivity() {
                         editor = EditorField(x, y)
                     }
 
+                    mGLView.requestRender()
                 }
-
-                draw()
 
             }
         }
@@ -145,11 +142,14 @@ class EditorActivity : AppCompatActivity() {
         if (coords[0] == -1) {
             when (coords[1]) {
                 1 -> {
-
-                    editor.setAction(coords[1])
+                    editor.setAction(
+                        EditorField.ACTION_SET_SNEK
+                    )
                 }
                 2 -> {
-                    editor.setAction(coords[1])
+                    editor.setAction(
+                        EditorField.ACTION_SET_BARRIER
+                    )
                 }
                 3 -> {
                     editor.clearSnek()
@@ -168,7 +168,12 @@ class EditorActivity : AppCompatActivity() {
             editor.react(coords)
         }
 
-        draw()
+        mGLView.requestRender()
+    }
+
+    val getField = fun(): Array<IntArray> {
+        return if (::editor.isInitialized)
+            editor.getField() else arrayOf(intArrayOf(0))
     }
 
     private fun changeSize() {
@@ -238,16 +243,6 @@ class EditorActivity : AppCompatActivity() {
 
         return
 
-    }
-
-    fun draw(): Boolean {
-        if (::mGLView.isInitialized) {
-            mGLView.redrawField(
-                editor.getField()
-            )
-            return true
-        }
-        return false
     }
 
 }
