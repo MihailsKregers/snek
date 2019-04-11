@@ -2,7 +2,7 @@ package com.moisha.snek.graphics
 
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
-import com.moisha.snek.game.objects.Game
+import com.moisha.snek.game.Game
 import com.moisha.snek.graphics.shapes.Square
 import com.moisha.snek.graphics.shapes.Triangle
 import javax.microedition.khronos.egl.EGLConfig
@@ -163,9 +163,27 @@ class GLRenderer(type: Int, getDrawData: () -> Array<IntArray>) : GLSurfaceView.
         //list for squares and their colors in OpenGL coords
         val squares: MutableList<Array<FloatArray>> = mutableListOf()
 
+        //field background - white area of field size
+        squares.add(
+            arrayOf(
+                floatArrayOf(
+                    -1.0f + xOffset, 1.0f - partSizeY * fieldY,
+                    -1.0f + xOffset, 1.0f,
+                    1.0f - xOffset, 1.0f,
+                    1.0f - xOffset, 1.0f - partSizeY * fieldY
+                ),
+                floatArrayOf(
+                    1.0f, 1.0f, 1.0f, 1.0f
+                )
+            )
+        )
+
         //field reading loop for adding data to drawing arrays
         for (i in 0..field.lastIndex) {
             for (j in 0..field[i].lastIndex) {
+                if (field[i][j] == Game.EMPTY_UNIT) { //nothing to draw if unit is empty - continue
+                    continue
+                }
                 val square =
                     Array(
                         2,
@@ -179,10 +197,6 @@ class GLRenderer(type: Int, getDrawData: () -> Array<IntArray>) : GLSurfaceView.
                         xOffset + -1.0f + partSizeX * i + partSizeX, 1.0f - partSizeY * j - partSizeY
                     )
                 when (field[i][j]) {
-                    Game.EMPTY_UNIT -> {
-                        square[1] =
-                            floatArrayOf(1.0f, 1.0f, 1.0f, 1.0f)
-                    }
                     Game.DIRECTION -> {
                         square[1] =
                             floatArrayOf(1.0f, 0.0f, 0.0f, 1.0f)
@@ -195,7 +209,7 @@ class GLRenderer(type: Int, getDrawData: () -> Array<IntArray>) : GLSurfaceView.
                         square[1] =
                             floatArrayOf(1.0f, 1.0f, 0.0f, 1.0f)
                     }
-                    else -> {
+                    else -> { //Snek
                         square[1] =
                             floatArrayOf(0.0f, 0.0f, 1.0f, 1.0f)
                     }

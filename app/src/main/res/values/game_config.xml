@@ -17,4 +17,6 @@
 
     <string name="empty_level_name">-nothing</string>
     <string name="empty_string"></string>
+
+    <integer name="move_time">500</integer>
 </resources>

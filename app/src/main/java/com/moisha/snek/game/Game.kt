@@ -1,13 +1,17 @@
-package com.moisha.snek.game.objects
+package com.moisha.snek.game
 
 import com.moisha.snek.database.model.Highscore
 import com.moisha.snek.database.model.Level
+import com.moisha.snek.game.objects.Flat
+import com.moisha.snek.game.objects.Maze
+import com.moisha.snek.game.objects.Meal
+import com.moisha.snek.game.objects.Snek
 
 /**
  * Main game handler class.
  */
 
-class Game(level: Level, uId: Int) {
+class Game(level: Level, uId: Int, state: State? = null) {
 
     companion object {
         const val DIRECTION_RIGHT = 1
@@ -21,17 +25,21 @@ class Game(level: Level, uId: Int) {
         const val SNEK_FROM = 2
     }
 
-    const val emptyField: Array<IntArray> = Array(level.size[0], { IntArray(level.size[1]) })
+    val emptyField: Array<IntArray> = Array(level.size[0], { IntArray(level.size[1]) })
 
     private val uId: Int = uId
     private val id: Int = level.id
 
-    private val flat: Flat = Flat(level.size[0], level.size[1])
+    private val flat: Flat =
+        Flat(level.size[0], level.size[1])
     private val maze: Maze = Maze(level.barriers)
-    private val meal: Meal = Meal()
-    private val snek: Snek = Snek(level.snek, level.direction)
+    private val meal: Meal = state?.let { Meal(state.meal) } ?: Meal()
+    private val snek: Snek = Snek(
+        state?.snek ?: level.snek,
+        state?.direction ?: level.direction
+    )
 
-    private var score = 0
+    private var score = state?.score ?: 0
 
     private var pendingDirection = 0
 
@@ -46,10 +54,13 @@ class Game(level: Level, uId: Int) {
     }
 
     init {
-        meal.newMeal(flat.randomPoint, checkFree)
+        if (state == null) {
+            meal.newMeal(flat.randomPoint, checkFree)
+        }
     }
 
     fun getField(): Array<IntArray> {
+        //getting copy of static empty field with barriers
         val field: Array<IntArray> = Array(
             emptyField.size,
             { index: Int ->
@@ -57,10 +68,17 @@ class Game(level: Level, uId: Int) {
             }
         )
 
+        //adding Snek to it
         val snek: List<IntArray> = this.snek.getSnek()
         for (i in snek) {
-            field[i[0]][i[1]] =
+            field[i[0]][i[1]] = snek.indexOf(i) + 2
         }
+
+        //adding meal
+        val meal: IntArray = this.meal.getMeal()
+        field[meal[0]][meal[1]] = Game.MEAL
+
+        return field
     }
 
     fun move(): Boolean {
@@ -92,9 +110,11 @@ class Game(level: Level, uId: Int) {
     }
 
     fun getScore(): Highscore {
-        val result: Highscore = Highscore(uId, id, score)
+        return Highscore(uId, id, score)
+    }
 
-        return result
+    fun getState(): State {
+        return State(snek.getSnek(), snek.getDirection(), meal.getMeal(), score)
     }
 
     fun setDirection(direction: Int) {

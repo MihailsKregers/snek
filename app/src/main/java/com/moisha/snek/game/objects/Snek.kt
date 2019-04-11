@@ -20,6 +20,10 @@ class Snek(startSnek: Collection<IntArray>, startDirection: Int) {
         }
     }
 
+    fun getDirection(): Int {
+        return this.direction
+    }
+
     fun allowedDirection(direction: Int): Boolean {
         return (this.direction - direction != 2 && this.direction - direction != -2)
     }
