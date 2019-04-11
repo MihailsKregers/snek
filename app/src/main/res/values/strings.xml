@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">snek</string>
+    <string-array name="sections">
+        <item>Start game</item>
+        <item>Highscores</item>
+        <item>Add level</item>
+        <item>Delete level</item>
+        <item>New level</item>
+        <item>Edit level</item>
+        <item>Change user</item>
+        <item>Exit game</item>
+    </string-array>
+    <string-array name="login_options">
+        <item>Login</item>
+        <item>Create user</item>
+    </string-array>
+    <string name="ok">Okay</string>
 </resources>
