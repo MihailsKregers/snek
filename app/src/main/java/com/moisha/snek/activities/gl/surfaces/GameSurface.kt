@@ -1,15 +1,12 @@
-package com.moisha.snek.graphics.surfaces
+package com.moisha.snek.activities.gl.surfaces
 
 import android.content.Context
 import android.opengl.GLSurfaceView
 import android.view.MotionEvent
-import com.moisha.snek.glactivities.GameActivity
+import com.moisha.snek.activities.gl.GameActivity
 import com.moisha.snek.graphics.GLRenderer
 
 class GameSurface(context: Context) : GLSurfaceView(context) {
-
-    private var xOffset: Int = 0
-    private var yOffset: Int = 0
 
     private val gameActivity: GameActivity = context as GameActivity
     private val mRenderer: GLRenderer

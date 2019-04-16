@@ -1,14 +1,16 @@
 package com.moisha.snek.activities
 
+import android.app.Application
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import com.moisha.snek.R
-import com.moisha.snek.glactivities.EditorActivity
-import com.moisha.snek.global.App
+import com.moisha.snek.App
+import com.moisha.snek.activities.gl.EditorActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,24 +33,25 @@ class MainActivity : AppCompatActivity() {
                         startActivity(Intent(this@MainActivity, StartGameActivity::class.java))
                     }
                     1 -> {
-                        //Highscores
-                        startActivity(Intent(this@MainActivity, SetLevelNameActivity::class.java))
-                    }
-                    2 -> {
+                        //Level manager
                         startActivity(Intent(this@MainActivity, EditLevelActivity::class.java))
                     }
-                    3 -> {
-                        //Delete level
+                    2 -> {
+                        //Highscores
+                        startActivity(Intent(this@MainActivity, HighscoreLevelActivity::class.java))
                     }
-                    4 -> {
-                        //New level
+                    3 -> {
+                        //Create level
                         startActivity(Intent(this@MainActivity, EditorActivity::class.java))
                     }
-                    5 -> {
-                        //Edit level
+                    4 -> {
+                        //Change user
+                        changeUser()
                     }
-                    6 -> changeUser()
-                    7 -> finishAffinity()
+                    5 -> {
+                        //Exit game
+                        ActivityCompat.finishAffinity(this@MainActivity)
+                    }
                 }
             }
         }

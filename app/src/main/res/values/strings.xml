@@ -2,11 +2,9 @@
     <string name="app_name">snek</string>
     <string-array name="sections">
         <item>Start game</item>
+        <item>My levels</item>
         <item>Highscores</item>
-        <item>Add level</item>
-        <item>Delete level</item>
-        <item>New level</item>
-        <item>Edit level</item>
+        <item>Create level</item>
         <item>Change user</item>
         <item>Exit game</item>
     </string-array>
@@ -14,5 +12,17 @@
         <item>Login</item>
         <item>Create user</item>
     </string-array>
+    <string-array name="speeds">
+        <item>Easy</item>
+        <item>Medium</item>
+        <item>Hard</item>
+    </string-array>
+    <string name="more_levels">More levels</string>
     <string name="ok">Okay</string>
+    <string name="diff">Select difficulty:</string>
+    <string name="score_title">Game over!</string>
+    <string name="score_body">Your score:&#160;</string>
+    <string name="name_error">Name is already used!</string>
+    <string name="name_empty_error">Name should not be empty!</string>
+    <string name="short_snek_error">Too short snek!</string>
 </resources>

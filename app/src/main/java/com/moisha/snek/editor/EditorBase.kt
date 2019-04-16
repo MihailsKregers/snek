@@ -1,9 +1,9 @@
-package com.moisha.snek.editor.internal
+package com.moisha.snek.editor
 
 import com.moisha.snek.R
-import com.moisha.snek.global.App
+import com.moisha.snek.App
 
-abstract class EditorFieldInternal(x: Int, y: Int) {
+abstract class EditorBase(x: Int, y: Int) {
 
     internal var x: Int = x
     internal var y: Int = y

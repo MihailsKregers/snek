@@ -1,4 +1,4 @@
-package com.moisha.snek.activities
+package com.moisha.snek.activities.forresult
 
 import android.app.Activity
 import android.content.Intent

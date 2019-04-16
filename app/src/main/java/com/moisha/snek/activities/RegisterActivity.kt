@@ -9,7 +9,7 @@ import android.widget.TextView
 import com.moisha.snek.R
 import com.moisha.snek.database.DatabaseInstance
 import com.moisha.snek.database.model.Player
-import com.moisha.snek.global.App
+import com.moisha.snek.App
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 

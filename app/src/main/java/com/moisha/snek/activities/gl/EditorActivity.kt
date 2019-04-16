@@ -1,4 +1,4 @@
-package com.moisha.snek.glactivities
+package com.moisha.snek.activities.gl
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -6,16 +6,16 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.google.gson.Gson
 import com.moisha.snek.R
-import com.moisha.snek.activities.SetLevelNameActivity
-import com.moisha.snek.activities.SetSizeActivity
 import com.moisha.snek.database.DatabaseInstance
 import com.moisha.snek.database.dao.LevelDao
 import com.moisha.snek.database.model.Level
 import com.moisha.snek.editor.EditorField
-import com.moisha.snek.global.App
-import com.moisha.snek.graphics.surfaces.EditorSurface
+import com.moisha.snek.App
+import com.moisha.snek.activities.forresult.SetLevelNameActivity
+import com.moisha.snek.activities.forresult.SetSizeActivity
+import com.moisha.snek.activities.gl.surfaces.EditorSurface
+import com.moisha.snek.utility.GsonStatic
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -28,7 +28,6 @@ class EditorActivity : AppCompatActivity() {
 
     private lateinit var mGLView: EditorSurface
     private lateinit var editor: EditorField
-    private val gson: Gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,14 +42,14 @@ class EditorActivity : AppCompatActivity() {
 
             val jsonEditorField: String = savedInstanceState?.getString("level")!!
 
-            this.editor = gson.fromJson<EditorField>(
-                jsonEditorField,
-                EditorField::class.java
-            )
+            this.editor = GsonStatic.unpackEditor(jsonEditorField)
 
         } else if (intent.hasExtra("level")) { // if called with level for editing
 
-            val level: Level = gson.fromJson(intent.getStringExtra("level"), Level::class.java)
+            val levelJson: String = intent.getStringExtra("level")
+
+            val level: Level = GsonStatic.unpackLevel(levelJson)
+
             editor = EditorField(level)
 
 
@@ -61,7 +60,7 @@ class EditorActivity : AppCompatActivity() {
                 SetSizeActivity::class.java
             )
 
-            startActivityForResult(intent, EditorActivity.GET_SIZE_REQUEST)
+            startActivityForResult(intent, GET_SIZE_REQUEST)
 
         }
 
@@ -78,7 +77,7 @@ class EditorActivity : AppCompatActivity() {
         if (::editor.isInitialized) {
             outState?.putString(
                 "level",
-                gson.toJson(editor)
+                GsonStatic.packEditor(editor)
             )
         }
     }
@@ -124,12 +123,11 @@ class EditorActivity : AppCompatActivity() {
     fun error() {
         this.runOnUiThread {
             val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-            builder.setMessage(R.string.snek_size_error)
-            builder.setTitle(R.string.short_snek_error)
-            builder.setNeutralButton(
-                R.string.ok,
-                { dialogInterface: DialogInterface, i: Int -> }
-            )
+                .setMessage(R.string.snek_size_error)
+                .setTitle(R.string.short_snek_error)
+                .setNeutralButton(
+                    R.string.ok
+                ) { _: DialogInterface, _: Int -> }
             val error: AlertDialog = builder.create()
 
             error.show()
@@ -185,7 +183,7 @@ class EditorActivity : AppCompatActivity() {
         getSizeIntent.putExtra("x", editor.getX())
         getSizeIntent.putExtra("y", editor.getY())
 
-        startActivityForResult(getSizeIntent, EditorActivity.GET_SIZE_REQUEST)
+        startActivityForResult(getSizeIntent, GET_SIZE_REQUEST)
 
         return
 
@@ -210,7 +208,10 @@ class EditorActivity : AppCompatActivity() {
                 SetLevelNameActivity::class.java
             )
 
-            startActivityForResult(getNameIntent, EditorActivity.GET_NAME_REQUEST)
+            startActivityForResult(
+                getNameIntent,
+                GET_NAME_REQUEST
+            )
 
         } else {
 
