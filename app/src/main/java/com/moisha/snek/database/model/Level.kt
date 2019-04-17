@@ -5,10 +5,15 @@ import android.arch.persistence.room.*
 @Entity(
     tableName = "levels",
     foreignKeys = arrayOf(
-        ForeignKey(entity = Player::class, parentColumns = arrayOf("id"), childColumns = arrayOf("uId"))
+        ForeignKey(
+            onDelete = ForeignKey.CASCADE,
+            entity = Player::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("uId")
+        )
     ),
     indices = arrayOf(
-        Index(value = arrayOf("id", "name", "size", "barriers", "snek", "direction", "uId"))
+        Index(value = arrayOf("id"))
     )
 )
 class Level constructor(

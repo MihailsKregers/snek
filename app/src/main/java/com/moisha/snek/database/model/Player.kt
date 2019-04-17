@@ -8,7 +8,7 @@ import android.arch.persistence.room.PrimaryKey
 @Entity(
     tableName = "players",
     indices = arrayOf(
-        Index(value = arrayOf("id", "name")),
+        Index(value = arrayOf("id")),
         Index(value = arrayOf("name"), unique = true)
     )
 )

@@ -6,11 +6,21 @@ import android.arch.persistence.room.*
 @Entity(
     tableName = "highscores",
     foreignKeys = arrayOf(
-        ForeignKey(entity = Player::class, parentColumns = arrayOf("id"), childColumns = arrayOf("uId")),
-        ForeignKey(entity = Level::class, parentColumns = arrayOf("id"), childColumns = arrayOf("levelId"))
+        ForeignKey(
+            onDelete = ForeignKey.CASCADE,
+            entity = Player::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("uId")
+        ),
+        ForeignKey(
+            onDelete = ForeignKey.CASCADE,
+            entity = Level::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("levelId")
+        )
     ),
     indices = arrayOf(
-        Index(value = arrayOf("id", "uId", "levelId", "score", "speed"))
+        Index(value = arrayOf("id"))
     )
 )
 class Highscore(uId: Int, levelId: Int, score: Int, speed: Int) {

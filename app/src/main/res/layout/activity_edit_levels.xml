@@ -5,22 +5,26 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".activities.LevelListActivity">
+        android:orientation="horizontal"
+        tools:context=".activities.EditLevelActivity">
     <ListView
             android:id="@+id/edit_level_list"
             android:layout_height="0dp"
+            android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true" android:layout_width="match_parent"
-            tools:layout_editor_absoluteX="0dp"
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@+id/button"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+    >
     </ListView>
     <Button
-            android:text="More levels"
+            android:text="@string/button_more_lvl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/button" app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="parent"/>
+            android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="parent"
+            android:onClick="moreLevels"/>
 
 </android.support.constraint.ConstraintLayout>

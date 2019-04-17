@@ -9,7 +9,7 @@ import android.widget.TextView
 import com.moisha.snek.R
 import com.moisha.snek.database.model.Level
 
-class LevelAdapter(context: Context, levelList: ArrayList<Level>) : BaseAdapter() {
+class LevelAddAdapter(context: Context, levelList: ArrayList<Level>) : BaseAdapter() {
     private val levelList: ArrayList<Level> = levelList
     private val context: Context = context
 
@@ -28,13 +28,16 @@ class LevelAdapter(context: Context, levelList: ArrayList<Level>) : BaseAdapter(
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val rowView = inflater.inflate(R.layout.list_item_user, parent, false)
+        val rowView = inflater.inflate(R.layout.list_item_level_add, parent, false)
 
-        val name = rowView.findViewById(R.id.list_item_name) as TextView
+        val name = rowView.findViewById(R.id.list_item_lvlname) as TextView
+
+        val id = rowView.findViewById(R.id.list_item_level_id) as TextView
 
         val level: Level = getItem(position) as Level
 
         name.text = level.name
+        id.text = level.id.toString()
 
         return rowView
     }

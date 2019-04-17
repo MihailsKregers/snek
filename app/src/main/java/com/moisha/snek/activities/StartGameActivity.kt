@@ -15,7 +15,7 @@ import com.moisha.snek.database.DatabaseInstance
 import com.moisha.snek.database.adapters.LevelAdapter
 import com.moisha.snek.database.model.Level
 import com.moisha.snek.utility.GsonStatic
-import kotlinx.android.synthetic.main.activity_level_list.*
+import kotlinx.android.synthetic.main.activity_start_game.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -25,12 +25,12 @@ class StartGameActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_level_list)
+        setContentView(R.layout.activity_start_game)
 
-        val listView: ListView = findViewById(R.id.add_level_list)
+        val listView: ListView = findViewById(R.id.level_list)
 
         adapter = LevelAdapter(this@StartGameActivity, arrayListOf<Level>())
-        add_level_list.adapter = adapter
+        level_list.adapter = adapter
 
         doAsync {
             val data: Collection<Level> = getVals()
@@ -58,7 +58,7 @@ class StartGameActivity : AppCompatActivity() {
                 override fun onClick(dialog: DialogInterface?, which: Int) {
                     val levelJson: String = GsonStatic.packLevel(level)
 
-                    val editorIntent: Intent = Intent(
+                    val editorIntent = Intent(
                         this@StartGameActivity,
                         GameActivity::class.java
                     )
