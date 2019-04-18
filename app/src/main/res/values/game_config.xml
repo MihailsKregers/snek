@@ -10,7 +10,6 @@
     <string name="snek_size_error">Minimum snek size is 2 units.</string>
     <integer name="min_snek_size">2</integer>
 
-    <string name="empty_level_name">-nothing</string>
     <string name="empty_string"></string>
 
     <integer name="slow_move">1000</integer>

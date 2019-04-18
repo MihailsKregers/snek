@@ -11,7 +11,7 @@ abstract class EditorBase(x: Int, y: Int) {
 
     internal var snekSize: Int = 0
 
-    var levelName: String = App.applicationContext().resources.getString(R.string.empty_level_name)
+    var levelName: String = ""
 
     protected fun barList(): List<IntArray> {
         //barrier list to be returned

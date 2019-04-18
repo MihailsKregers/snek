@@ -32,15 +32,6 @@
         </activity>
 
         <activity
-                android:name=".activities.RegisterActivity"
-                android:parentActivityName=".activities.LoginActivity">
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".activities.LoginActivity"/>
-        </activity>
-
-        <activity
                 android:name=".activities.gl.EditorActivity"
                 android:parentActivityName=".activities.MainActivity">
             <!-- The meta-data element is needed for versions lower than 4.1 -->
@@ -53,7 +44,7 @@
         </activity>
 
         <activity
-                android:name=".activities.forresult.SetLevelNameActivity"
+                android:name=".activities.forresult.SetNameActivity"
                 android:parentActivityName=".activities.gl.EditorActivity">
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data

@@ -12,7 +12,7 @@ import com.moisha.snek.database.dao.LevelDao
 import com.moisha.snek.database.model.Level
 import com.moisha.snek.editor.EditorField
 import com.moisha.snek.App
-import com.moisha.snek.activities.forresult.SetLevelNameActivity
+import com.moisha.snek.activities.forresult.SetNameActivity
 import com.moisha.snek.activities.forresult.SetSizeActivity
 import com.moisha.snek.activities.gl.surfaces.EditorSurface
 import com.moisha.snek.utility.GsonStatic
@@ -87,10 +87,10 @@ class EditorActivity : AppCompatActivity() {
 
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == GET_NAME_REQUEST) {
-                if (data?.hasExtra("name") ?: false) {
+                if (data?.hasExtra(SetNameActivity.NAME_EXTRA) ?: false) {
 
                     saveLevel(
-                        data?.getStringExtra("name") ?: resources.getString(R.string.empty_level_name)
+                        data?.getStringExtra(SetNameActivity.NAME_EXTRA) ?: resources.getString(R.string.empty_string)
                     )
 
                 }
@@ -117,6 +117,8 @@ class EditorActivity : AppCompatActivity() {
                 }
 
             }
+        } else if (requestCode == GET_SIZE_REQUEST && !::editor.isInitialized) {
+            finish()
         }
     }
 
@@ -139,14 +141,10 @@ class EditorActivity : AppCompatActivity() {
         if (coords[0] == -1) {
             when (coords[1]) {
                 1 -> {
-                    editor.setAction(
-                        EditorField.ACTION_SET_SNEK
-                    )
+                    editor.setAction(EditorField.ACTION_SET_SNEK)
                 }
                 2 -> {
-                    editor.setAction(
-                        EditorField.ACTION_SET_BARRIER
-                    )
+                    editor.setAction(EditorField.ACTION_SET_BARRIER)
                 }
                 3 -> {
                     editor.clearSnek()
@@ -174,7 +172,6 @@ class EditorActivity : AppCompatActivity() {
     }
 
     private fun changeSize() {
-
         val getSizeIntent = Intent(
             this@EditorActivity,
             SetSizeActivity::class.java
@@ -186,26 +183,28 @@ class EditorActivity : AppCompatActivity() {
         startActivityForResult(getSizeIntent, GET_SIZE_REQUEST)
 
         return
-
     }
 
-    private fun saveLevel(name: String = resources.getString(R.string.empty_level_name)) {
+    private fun saveLevel(name: String = resources.getString(R.string.empty_string)) {
         if (editor.getSnekSize() - 1 < resources.getInteger(R.integer.min_snek_size)) {
             error()
             return
         }
 
-        if (!name.equals(resources.getString(R.string.empty_level_name))) {
-
+        if (!name.equals(resources.getString(R.string.empty_string))) {
             editor.levelName = name
-
         }
 
-        if (editor.levelName.equals(resources.getString(R.string.empty_level_name))) {
+        if (editor.levelName.equals(resources.getString(R.string.empty_string))) {
 
             val getNameIntent = Intent(
                 this@EditorActivity,
-                SetLevelNameActivity::class.java
+                SetNameActivity::class.java
+            )
+
+            getNameIntent.putExtra(
+                SetNameActivity.TYPE_EXTRA_NAME,
+                SetNameActivity.LEVEL_NAME_TYPE
             )
 
             startActivityForResult(
@@ -214,35 +213,24 @@ class EditorActivity : AppCompatActivity() {
             )
 
         } else {
-
             val uId = App.getUser()
             val level: Level = editor.getLevel(uId)
 
             doAsync {
-
                 val lvldao: LevelDao = DatabaseInstance.getInstance(this@EditorActivity).levelDao()
-
                 if (lvldao.nameUsed(level.name) > 0) {
-
                     level.id = lvldao.getIdByName(level.name)
                     lvldao.updateLevels(level)
-
                 } else {
-
                     lvldao.insert(level)
-
                 }
-
                 uiThread {
-
                     finish()
-
                 }
             }
         }
 
         return
-
     }
 
 }
