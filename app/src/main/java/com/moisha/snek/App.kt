@@ -1,4 +1,4 @@
-package com.moisha.snek.global
+package com.moisha.snek
 
 import android.app.Application
 import android.content.Context
@@ -44,18 +44,15 @@ class App : Application() {
         }
 
         private fun instantiate() {
-            settings = PreferenceManager.getDefaultSharedPreferences(App.applicationContext())
+            settings = PreferenceManager.getDefaultSharedPreferences(applicationContext())
             editor = settings?.edit()
         }
     }
 
     override fun onCreate() {
         super.onCreate()
-        // initialize for any
 
-        // Use ApplicationContext.
-        // example: SharedPreferences etc...
-        settings = PreferenceManager.getDefaultSharedPreferences(App.applicationContext())
+        settings = PreferenceManager.getDefaultSharedPreferences(applicationContext())
         editor = settings?.edit()
     }
 }

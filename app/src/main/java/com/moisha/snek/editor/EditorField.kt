@@ -1,7 +1,6 @@
 package com.moisha.snek.editor
 
 import com.moisha.snek.database.model.Level
-import com.moisha.snek.editor.internal.EditorFieldInternal
 
 /**
  * Class for handling editor game field
@@ -13,7 +12,7 @@ import com.moisha.snek.editor.internal.EditorFieldInternal
  *      >1 - Snek
  */
 
-class EditorField(x: Int, y: Int) : EditorFieldInternal(x, y) {
+class EditorField(x: Int, y: Int) : EditorBase(x, y) {
 
     companion object {
         const val ACTION_SET_SNEK = 1

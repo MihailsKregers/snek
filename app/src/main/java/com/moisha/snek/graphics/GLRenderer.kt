@@ -13,6 +13,7 @@ class GLRenderer(type: Int, getDrawData: () -> Array<IntArray>) : GLSurfaceView.
     companion object {
         const val TYPE_GAME_RENDER: Int = 1
         const val TYPE_EDITOR_RENDER: Int = 2
+        const val TYPE_PREVIEW: Int = 3
     }
 
     private lateinit var square: Square
@@ -144,9 +145,7 @@ class GLRenderer(type: Int, getDrawData: () -> Array<IntArray>) : GLSurfaceView.
         }
 
         //draw all sent triangles
-        for (i in 0..
-                (if (hasSquares()) menu[2].lastIndex - 1
-                else menu[2].lastIndex)) {
+        for (i in 0..menu[2].lastIndex) {
             triangle.draw(menu[2].get(i), menu[3].get(i))
         }
     }
@@ -515,18 +514,6 @@ class GLRenderer(type: Int, getDrawData: () -> Array<IntArray>) : GLSurfaceView.
             )
 
         }
-
-        //play button - in the end of triangle list
-        tr_coords.add(
-            floatArrayOf(
-                0.0f - pButtonSizeX / 2.0f, 1.0f - ((2.0f - menuSizeY) / 2) + pButtonSizeY / 2.0f,
-                0.0f + pButtonSizeX / 2.0f, 1.0f - ((2.0f - menuSizeY) / 2),
-                0.0f - pButtonSizeX / 2.0f, 1.0f - ((2.0f - menuSizeY) / 2) - pButtonSizeY / 2.0f
-            )
-        )
-        tr_colors.add(
-            floatArrayOf(0.0f, 1.0f, 0.0f, 1.0f)
-        )
 
         //store calculated data for rendering
         menu = arrayOf(

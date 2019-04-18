@@ -19,4 +19,7 @@ interface PlayerDao {
 
     @Query("SELECT id FROM players WHERE name = :name LIMIT 1")
     fun getIdByName(name: String): Int
+
+    @Query("SELECT name FROM players WHERE id = :id LIMIT 1")
+    fun getNameById(id: Int): String
 }

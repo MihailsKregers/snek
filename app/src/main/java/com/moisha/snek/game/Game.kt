@@ -11,7 +11,7 @@ import com.moisha.snek.game.objects.Snek
  * Main game handler class.
  */
 
-class Game(level: Level, uId: Int, state: State? = null) {
+class Game(level: Level, uId: Int, speed: Int, state: State? = null) {
 
     companion object {
         const val DIRECTION_RIGHT = 1
@@ -29,6 +29,7 @@ class Game(level: Level, uId: Int, state: State? = null) {
 
     private val uId: Int = uId
     private val id: Int = level.id
+    private val speed: Int = speed
 
     private val flat: Flat =
         Flat(level.size[0], level.size[1])
@@ -109,8 +110,8 @@ class Game(level: Level, uId: Int, state: State? = null) {
         return false //if something not returned earlier - game logic error, also stop game
     }
 
-    fun getScore(): Highscore {
-        return Highscore(uId, id, score)
+    fun getResult(): Highscore {
+        return Highscore(uId, id, score, speed)
     }
 
     fun getState(): State {

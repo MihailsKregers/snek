@@ -1,10 +1,9 @@
-package com.moisha.snek.graphics.surfaces
+package com.moisha.snek.activities.gl.surfaces
 
 import android.content.Context
 import android.opengl.GLSurfaceView
 import android.view.MotionEvent
-import android.view.View
-import com.moisha.snek.glactivities.EditorActivity
+import com.moisha.snek.activities.gl.EditorActivity
 import com.moisha.snek.graphics.GLRenderer
 
 class EditorSurface constructor(context: Context) : GLSurfaceView(context) {
