@@ -54,7 +54,25 @@ class EditorFieldUnitTest {
 
     @Test
     @Order(3)
-    fun t3_ChangeSize() {
+    fun t3_ChangeToSameSize() { //fixed bug FB-02
+        editor.changeSize(5, 3)
+        assertArrayEquals(
+            arrayOf(
+                intArrayOf(0, 0, 0),
+                intArrayOf(0, 1, -1),
+                intArrayOf(0, 2, -1),
+                intArrayOf(4, 3, 5),
+                intArrayOf(0, 0, 0)
+            ),
+            editor.getField(),
+            "Snek and barriers in field"
+        )
+        assertEquals(5, editor.getSnekSize(), "Snek size is")
+    }
+
+    @Test
+    @Order(4)
+    fun t4_ChangeSize() {
         editor.changeSize(5, 5)
         assertArrayEquals(
             arrayOf(
@@ -71,8 +89,8 @@ class EditorFieldUnitTest {
     }
 
     @Test
-    @Order(4)
-    fun t4_ClearBarriers() {
+    @Order(5)
+    fun t5_ClearBarriers() {
         editor.clearBarriers()
         assertArrayEquals(
             arrayOf(
@@ -88,8 +106,8 @@ class EditorFieldUnitTest {
     }
 
     @Test
-    @Order(5)
-    fun t5_SetUnreachableSnekPos() {
+    @Order(6)
+    fun t6_SetUnreachableSnekPos() {
         editor.setSnek(0, 4)
         assertArrayEquals(
             arrayOf(
@@ -105,8 +123,8 @@ class EditorFieldUnitTest {
     }
 
     @Test
-    @Order(6)
-    fun t6_SetBarrierOnSnek() {
+    @Order(7)
+    fun t7_SetBarrierOnSnek() {
         editor.setBarrier(1, 1)
         assertArrayEquals(
             arrayOf(
@@ -122,8 +140,8 @@ class EditorFieldUnitTest {
     }
 
     @Test
-    @Order(7)
-    fun t7_SetAndRemoveBarriers() {
+    @Order(8)
+    fun t8_SetAndRemoveBarriers() {
         editor.setBarrier(0, 3)
         editor.setBarrier(1, 3) // set barrier on (1;3)
         editor.setBarrier(1, 3) // remove barrier on (1;3)
@@ -142,8 +160,8 @@ class EditorFieldUnitTest {
     }
 
     @Test
-    @Order(8)
-    fun t8_SetSnekOnBarrier() {
+    @Order(9)
+    fun t9_SetSnekOnBarrier() {
         editor.setSnek(3, 4)
         editor.setSnek(3, 3)
         editor.setSnek(2, 3)
@@ -162,8 +180,8 @@ class EditorFieldUnitTest {
     }
 
     @Test
-    @Order(9)
-    fun t9_RemoveSnekPart() {
+    @Order(10)
+    fun t10_RemoveSnekPart() {
         editor.setSnek(3, 4) // trying to remove NOT end of Snek
         editor.setSnek(3, 3) // removing end
         assertArrayEquals(
@@ -181,8 +199,8 @@ class EditorFieldUnitTest {
     }
 
     @Test
-    @Order(10)
-    fun t10_ClearSnek() {
+    @Order(11)
+    fun t11_ClearSnek() {
         editor.clearSnek()
         assertArrayEquals(
             arrayOf(
@@ -199,8 +217,8 @@ class EditorFieldUnitTest {
     }
 
     @Test
-    @Order(11)
-    fun t11_GetLevelObject() {
+    @Order(12)
+    fun t12_GetLevelObject() {
         editor.setSnek(0, 4)
         editor.setSnek(0, 0)
         editor.setSnek(0, 1)
@@ -235,12 +253,12 @@ class EditorFieldUnitTest {
                 ).reversed().get(i), level.snek.get(i), "Sneks " + i.toString() + " element is"
             )
         }
-        assertEquals(3, level.direction, "Sneks direction is")
+        assertEquals(4, level.direction, "Sneks direction is")
     }
 
     @Test
-    @Order(12)
-    fun t12_UnpackLevel() {
+    @Order(13)
+    fun t13_UnpackLevel() {
         val level: Level = editor.getLevel(1)
         val editor2: EditorField = EditorField(level)
         assertArrayEquals(
