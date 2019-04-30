@@ -238,9 +238,10 @@ class GLRenderer(type: Int, getDrawData: () -> Array<IntArray>) : GLSurfaceView.
             } else {
                 coords[1] = 6
             }
-        } else if (renderType == TYPE_EDITOR_RENDER) { //not needed to react
+        } else if (renderType == TYPE_EDITOR_RENDER) { //not needed to react if is not editor
             if (xTouch >= xOffsetPt && xTouch <= xOffsetPt + partPt * fieldX && yTouch <= partPt * fieldY) {
                 coords[0] = (xTouch - xOffsetPt) / partPt
+                if (coords[0] == fieldX) coords[0]-- //FB-03 fix
                 coords[1] = yTouch / partPt
             }
         }

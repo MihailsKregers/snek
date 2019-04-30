@@ -70,7 +70,7 @@ class Game(level: Level, uId: Int, speed: Int, state: State? = null) {
         )
 
         //adding Snek to it
-        val snek: List<IntArray> = this.snek.getSnek()
+        val snek: List<IntArray> = this.snek.getSnek().reversed()
         for (i in snek) {
             field[i[0]][i[1]] = snek.indexOf(i) + 2
         }
