@@ -1,8 +1,5 @@
 package com.moisha.snek.editor
 
-import com.moisha.snek.R
-import com.moisha.snek.App
-
 abstract class EditorBase(x: Int, y: Int) {
 
     internal var x: Int = x
@@ -78,8 +75,7 @@ abstract class EditorBase(x: Int, y: Int) {
                 field[snek.last()[0] + 1][snek.last()[1]] == snek.size + 1
             ) {
 
-                if (field[snek.last()[0] + 1][snek.last()[1]] == snek.size + 1)
-                    snek.add(intArrayOf(snek.last()[0] + 1, snek.last()[1]))
+                snek.add(intArrayOf(snek.last()[0] + 1, snek.last()[1]))
 
             } else if (snek.last()[0] - 1 >= 0 &&
                 field[snek.last()[0] - 1][snek.last()[1]] == snek.size + 1
@@ -100,6 +96,34 @@ abstract class EditorBase(x: Int, y: Int) {
 
                 snek.add(intArrayOf(snek.last()[0], snek.last()[1] - 1))
 
+            } else if (snek.last()[0] == field.lastIndex && //FB-01 fix start
+                field.size == newField.size &&
+                field[0][snek.last()[1]] == snek.size + 1
+            ) {
+
+                snek.add(intArrayOf(0, snek.last()[1]))
+
+            } else if (snek.last()[0] == 0 &&
+                field.size == newField.size &&
+                field[field.lastIndex][snek.last()[1]] == snek.size + 1
+            ) {
+
+                snek.add(intArrayOf(field.lastIndex, snek.last()[1]))
+
+            } else if (snek.last()[1] == field[0].lastIndex &&
+                field[0].size == newField[0].size &&
+                field[snek.last()[0]][0] == snek.size + 1
+            ) {
+
+                snek.add(intArrayOf(snek.last()[0], 0))
+
+            } else if (snek.last()[1] == 0 &&
+                field[0].size == newField[0].size &&
+                field[snek.last()[0]][field[0].lastIndex] == snek.size + 1
+            ) {
+
+                snek.add(intArrayOf(snek.last()[0], field[0].lastIndex))
+                //FB-01 fix end
             } else {
                 snekSize = newSnekSize
                 return snek.toList()
