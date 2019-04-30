@@ -74,7 +74,7 @@ abstract class EditorBase(x: Int, y: Int) {
                 snek.last()[0] + 1 < field.size &&
                 field[snek.last()[0] + 1][snek.last()[1]] == snek.size + 1
             ) {
-
+              
                 snek.add(intArrayOf(snek.last()[0] + 1, snek.last()[1]))
 
             } else if (snek.last()[0] - 1 >= 0 &&
