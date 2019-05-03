@@ -183,11 +183,20 @@ class GLRenderer(type: Int, getDrawData: () -> Array<IntArray>) : GLSurfaceView.
                 if (field[i][j] == Game.EMPTY_UNIT) { //nothing to draw if unit is empty - continue
                     continue
                 }
+
+                var second = false
+                val secondSquare =
+                    Array(
+                        2,
+                        { floatArrayOf() }
+                    )
+
                 val square =
                     Array(
                         2,
                         { floatArrayOf() }
                     )
+
                 square[0] =
                     floatArrayOf(
                         xOffset + -1.0f + partSizeX * i, 1.0f - partSizeY * j - partSizeY,
@@ -195,6 +204,87 @@ class GLRenderer(type: Int, getDrawData: () -> Array<IntArray>) : GLSurfaceView.
                         xOffset + -1.0f + partSizeX * i + partSizeX, 1.0f - partSizeY * j,
                         xOffset + -1.0f + partSizeX * i + partSizeX, 1.0f - partSizeY * j - partSizeY
                     )
+                //if it is Snek - change shape
+                if (field[i][j] >= Game.SNEK_FROM) {
+                    square[0][1] += partSizeY * 0.1f
+                    square[0][7] += partSizeY * 0.1f
+                    square[0][3] -= partSizeY * 0.1f
+                    square[0][5] -= partSizeY * 0.1f
+
+                    square[0][0] += partSizeX * 0.1f
+                    square[0][2] += partSizeX * 0.1f
+                    square[0][4] -= partSizeX * 0.1f
+                    square[0][6] -= partSizeX * 0.1f
+
+                    if (i != 0 &&
+                        field[i - 1][j] == field[i][j] + 1
+                    ) {
+                        square[0][0] -= partSizeX * 0.2f
+                        square[0][2] -= partSizeX * 0.2f
+                    } else if (i != field.lastIndex &&
+                        field[i + 1][j] == field[i][j] + 1
+                    ) {
+                        square[0][4] += partSizeX * 0.2f
+                        square[0][6] += partSizeX * 0.2f
+                    } else if (j != 0 &&
+                        field[i][j - 1] == field[i][j] + 1
+                    ) {
+                        square[0][3] += partSizeY * 0.2f
+                        square[0][5] += partSizeY * 0.2f
+                    } else if (j != field[i].lastIndex &&
+                        field[i][j + 1] == field[i][j] + 1
+                    ) {
+                        square[0][1] -= partSizeY * 0.2f
+                        square[0][7] -= partSizeY * 0.2f
+                    }
+
+                    if (i == 0 &&
+                        field[field.lastIndex][j] == field[i][j] + 1
+                    ) {
+                        square[0][0] -= partSizeX * 0.1f
+                        square[0][2] -= partSizeX * 0.1f
+                        second = true
+                        secondSquare[0] = square[0].copyOf()
+                        secondSquare[0][0] = 1.0f - xOffset - partSizeX * 0.1f
+                        secondSquare[0][2] = 1.0f - xOffset - partSizeX * 0.1f
+                        secondSquare[0][4] = 1.0f - xOffset
+                        secondSquare[0][6] = 1.0f - xOffset
+                    } else if (i == field.lastIndex &&
+                        field[0][j] == field[i][j] + 1
+                    ) {
+                        square[0][4] += partSizeX * 0.1f
+                        square[0][6] += partSizeX * 0.1f
+                        second = true
+                        secondSquare[0] = square[0].copyOf()
+                        secondSquare[0][0] = -1.0f + xOffset + partSizeX * 0.1f
+                        secondSquare[0][2] = -1.0f + xOffset + partSizeX * 0.1f
+                        secondSquare[0][4] = -1.0f + xOffset
+                        secondSquare[0][6] = -1.0f + xOffset
+                    } else if (j == 0 &&
+                        field[i][field[i].lastIndex] == field[i][j] + 1
+                    ) {
+                        square[0][3] += partSizeY * 0.1f
+                        square[0][5] += partSizeY * 0.1f
+                        second = true
+                        secondSquare[0] = square[0].copyOf()
+                        secondSquare[0][1] = 1.0f - partSizeY * field[i].size
+                        secondSquare[0][7] = 1.0f - partSizeY * field[i].size
+                        secondSquare[0][3] = 1.0f - partSizeY * field[i].size + partSizeY * 0.1f
+                        secondSquare[0][5] = 1.0f - partSizeY * field[i].size + partSizeY * 0.1f
+                    } else if (j == field[i].lastIndex &&
+                        field[i][0] == field[i][j] + 1
+                    ) {
+                        square[0][1] -= partSizeY * 0.1f
+                        square[0][7] -= partSizeY * 0.1f
+                        second = true
+                        secondSquare[0] = square[0].copyOf()
+                        secondSquare[0][1] = 1.0f - partSizeY * 0.1f
+                        secondSquare[0][7] = 1.0f - partSizeY * 0.1f
+                        secondSquare[0][3] = 1.0f
+                        secondSquare[0][5] = 1.0f
+                    }
+                }
+
                 when (field[i][j]) {
                     Game.DIRECTION -> {
                         square[1] =
@@ -214,6 +304,11 @@ class GLRenderer(type: Int, getDrawData: () -> Array<IntArray>) : GLSurfaceView.
                     }
                 }
                 squares.add(square)
+                if (second) {
+                    secondSquare[1] =
+                        floatArrayOf(0.0f, 0.0f, 1.0f, 1.0f)
+                    squares.add(secondSquare)
+                }
             }
         }
 
