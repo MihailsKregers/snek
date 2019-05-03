@@ -38,6 +38,10 @@
     <string name="score_title">Game over!</string>
     <string name="score_body">Your score:&#160;</string>
 
+    <!--WRONG SIZE ALERT-->
+    <string name="wsize_title">Incorrect size!</string>
+    <string name="wsize_body">Both fields are required.</string>
+
     <!--ALERT NEUTRAL BUTTON-->
     <string name="ok">Okay</string>
 
