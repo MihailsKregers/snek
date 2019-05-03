@@ -54,6 +54,7 @@
     <string name="button_unlink">Unlink</string>
     <string name="button_back">Back</string>
     <string name="button_save">Save</string>
+    <string name="button_yeap">Yeap</string>
 
     <!--HINTS-->
     <string name="hint_level_name">Level name:</string>

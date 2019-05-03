@@ -48,7 +48,7 @@
             app:layout_constraintEnd_toStartOf="@+id/set_size_y" app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="48dp"/>
     <Button
-            android:text="Yeap"
+            android:text="@string/button_yeap"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/button_set_size"
