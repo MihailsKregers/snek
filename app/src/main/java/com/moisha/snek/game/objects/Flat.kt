@@ -1,16 +1,15 @@
 package com.moisha.snek.game.objects
 
-import kotlin.random.Random
-
 /**
  * Class for providing flat data in actual game.
  */
 
-class Flat(sizeX: Int, sizeY: Int) {
+class Flat(sizeX: Int, sizeY: Int, acc: List<IntArray> = listOf()) {
 
     // flat coordinate limits
     private val xRange: IntRange = IntRange(0, sizeX - 1)
     private val yRange: IntRange = IntRange(0, sizeY - 1)
+    private var accessible: List<IntArray> = acc
 
     val keepInFlat = fun(coord: IntArray): IntArray {
         if (coord[0] > xRange.last) return intArrayOf(xRange.first, coord[1])
@@ -20,9 +19,49 @@ class Flat(sizeX: Int, sizeY: Int) {
         return coord // if nothing happened earlier - return as it is
     }
 
-    // returns random point in flat boundaries
-    val randomPoint = fun(): IntArray {
-        return intArrayOf(Random.nextInt(xRange.first, xRange.last), Random.nextInt(yRange.first, yRange.last))
+    /**
+     * Returns random point, where meal can be placed
+     */
+    fun meal(isSnek: (IntArray) -> Boolean): IntArray {
+        val points: MutableList<IntArray> = mutableListOf()
+        accessible.forEach {
+            if (!isSnek(it)) points.add(it)
+        }
+        if (points.isNotEmpty())
+            return points.random()
+        else
+            return intArrayOf(-1, -1)
+    }
+
+    private fun MutableList<IntArray>.deepContains(value: IntArray): Boolean {
+        this.forEach {
+            if (it.contentEquals(value)) return true
+        }
+        return false
+    }
+
+    fun calcAccessible(isAccessible: (IntArray) -> Boolean, notBarrier: (IntArray) -> Boolean) {
+        val points: MutableList<IntArray> = mutableListOf()
+        for (i in xRange.first..xRange.last) {
+            for (j in yRange.first..yRange.last) {
+                print(i)
+                print(j)
+                println()
+                val point: IntArray = intArrayOf(i, j)
+                if (notBarrier(point)) {
+                    val ac: Boolean = isAccessible(point)
+                    println(ac)
+                    if (ac) {
+                        points.add(point)
+                    }
+                }
+            }
+        }
+        accessible = points.toList()
+    }
+
+    fun getAcc(): List<IntArray> {
+        return accessible
     }
 
 }

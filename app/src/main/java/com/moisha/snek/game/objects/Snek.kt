@@ -74,7 +74,7 @@ class Snek(startSnek: Collection<IntArray>, startDirection: Int) {
         return head
     }
 
-    fun onPoint(point: IntArray): Boolean {
+    val onPoint = fun(point: IntArray): Boolean {
 
         for (i in state) {
             if (i.contentEquals(point)) {

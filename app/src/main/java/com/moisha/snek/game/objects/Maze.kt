@@ -11,13 +11,12 @@ class Maze(barriers: Collection<IntArray>) {
     // check if exists barrier on provided place
     val checkBarrier = fun(coord: IntArray): Boolean {
 
-        for (i in barriers) {
-            if (i.contentEquals(coord)) {
-                return false //if on barrier
-            }
+        barriers.forEach {
+            //if on barrier
+            if (it.contentEquals(coord)) return false
         }
-
         return true //if not on barrier
+
     }
 
     fun getBarriers(): List<IntArray> {
